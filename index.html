@@ -272,9 +272,8 @@
             </div>
 
             <div class="alerts-panel">
-                <h2><i data-lucide="bell" style="color: var(--danger);"></i> Jurnal Alerte Anomali</h2>
-                <div class="alert-list" id="alert-container">
-                    </div>
+                <h2><i data-lucide="bell" style="color: var(--danger);"></i> Jurnal Alerte Anomalii</h2>
+                <div class="alert-list" id="alert-container"></div>
             </div>
         </div>
     </div>
@@ -329,73 +328,66 @@
             `;
             container.insertBefore(alertItem, container.firstChild);
             
-            // Limitare listă la ultimele 8 alerte
             if (container.children.length > 8) {
                 container.removeChild(container.lastChild);
             }
         }
 
-        // --- INTEGRAREA CLOUDFLARE ---
-        // Când ai gata API-ul din Cloudflare Workers, înlocuiește funcția simulateData() cu un fetch real:
-        
+        // URL-ul oficial al Worker-ului tău din Cloudflare
+        const WORKER_URL = 'https://dashboard-telematic-iot.dinumadalin112.workers.dev/api/data';
+
+        // Preluarea și actualizarea datelor reale din Edge Cloud
         async function fetchCloudflareData() {
             try {
-                const response = await fetch('https://dashboard-telematic-iot.dinumadalin112.workers.dev/api/data');
+                const response = await fetch(WORKER_URL);
                 const json = await response.json();
-                updateDashboard(json.temp, json.vibe, json.current);
+                
+                // Generăm eticheta de timp curentă pentru grafic
+                const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                // Extragerea valorilor sosite din baza de date Cloudflare KV
+                const temp = parseFloat(json.temp || 0).toFixed(1);
+                const vibe = parseFloat(json.vibe || 0).toFixed(2);
+                const current = parseFloat(json.current || 0).toFixed(1);
+
+                // Verificare praguri și sistem inteligent de alerte active
+                if (temp > 72.0) {
+                    addAlert(`Supraîncălzire detectată la motor: ${temp}°C`, 'danger');
+                }
+                if (vibe > 1.8) {
+                    addAlert(`Vibrații RMS peste pragul critic admis: ${vibe}g`, 'warning');
+                }
+
+                // Actualizare instantanee a cardurilor superioare din UI
+                document.getElementById('live-temp').innerText = `${temp} °C`;
+                document.getElementById('live-vibe').innerText = `${vibe} g`;
+                document.getElementById('live-current').innerText = `${current} A`;
+
+                // Schimbare dinamică a culorilor de alertă vizuală
+                document.getElementById('live-temp').style.color = temp > 72 ? 'var(--danger)' : 'var(--text-main)';
+                document.getElementById('live-vibe').style.color = vibe > 1.8 ? 'var(--warning)' : 'var(--text-main)';
+
+                // Push dinamic de date în cele 3 grafice independente
+                [tempChart, vibeChart, currentChart].forEach((chart, index) => {
+                    const val = index === 0 ? temp : index === 1 ? vibe : current;
+                    chart.data.labels.push(timeLabel);
+                    chart.data.datasets[0].data.push(val);
+                    
+                    // Menținem o fereastră glisantă de maximum 12 puncte pe ecran
+                    if (chart.data.labels.length > 12) {
+                        chart.data.labels.shift();
+                        chart.data.datasets[0].data.shift();
+                    }
+                    chart.update('none'); // Randare ultra-rapidă fără latențe de animație
+                });
+
             } catch (err) {
                 console.error("Eroare la preluarea datelor din Cloudflare Edge:", err);
             }
         }
+
+        // Interogăm backend-ul real la fiecare secundă
         setInterval(fetchCloudflareData, 1000);
-        
-
-        // Simulare flux de date (pentru demonstrație live la licență până legi fizic ESP32-ul)
-        function simulateData() {
-            const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            
-            // Generare valori aleatorii normale cu spike-uri ocazionale (anomalii)
-            let temp = (64 + Math.random() * 4).toFixed(1);
-            let vibe = (0.8 + Math.random() * 0.4).toFixed(2);
-            let current = (12 + Math.random() * 2).toFixed(1);
-
-            // Simulare anomalie termică aleatorie (10% șanse)
-            if (Math.random() > 0.9) {
-                temp = (73 + Math.random() * 5).toFixed(1);
-                addAlert(`Supraîncălzire detectată la rulmentul frontal: ${temp}°C`, 'danger');
-            }
-            // Simulare anomalie vibrații (10% șanse)
-            if (Math.random() > 0.92) {
-                vibe = (1.9 + Math.random() * 0.8).toFixed(2);
-                addAlert(`Vibrații RMS peste pragul admis la motor: ${vibe}g`, 'warning');
-            }
-
-            // Actualizare valori în cardurile de sus
-            document.getElementById('live-temp').innerText = `${temp} °C`;
-            document.getElementById('live-vibe').innerText = `${vibe} g`;
-            document.getElementById('live-current').innerText = `${current} A`;
-
-            // Schimbare dinamică a culorii textului de live în caz de alertă
-            document.getElementById('live-temp').style.color = temp > 72 ? 'var(--danger)' : 'var(--text-main)';
-            document.getElementById('live-vibe').style.color = vibe > 1.8 ? 'var(--warning)' : 'var(--text-main)';
-
-            // Push date în grafice
-            [tempChart, vibeChart, currentChart].forEach((chart, index) => {
-                const val = index === 0 ? temp : index === 1 ? vibe : current;
-                chart.data.labels.push(timeLabel);
-                chart.data.datasets[0].data.push(val);
-                
-                // Menținem doar ultimele 12 puncte pe grafic pentru lizibilitate
-                if (chart.data.labels.length > 12) {
-                    chart.data.labels.shift();
-                    chart.data.datasets[0].data.shift();
-                }
-                chart.update('none'); // Update rapid fără animație greoaie
-            });
-        }
-
-        // Rulare simulare la fiecare secundă
-        setInterval(simulateData, 1000);
     </script>
 </body>
 </html>
