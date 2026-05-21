@@ -227,7 +227,7 @@
                     <i data-lucide="thermometer" style="color: var(--primary);"></i>
                 </div>
                 <div>
-                    <div class="card-value" id="live-temp">-- °C</div>
+                    <div class="card-value" id="live-temperatura">-- °C</div>
                     <p style="color: var(--text-muted); font-size: 0.85rem;">Prag critic: > 72.0°C</p>
                 </div>
             </div>
@@ -238,7 +238,7 @@
                     <i data-lucide="activity" style="color: var(--warning);"></i>
                 </div>
                 <div>
-                    <div class="card-value" id="live-vibe">-- g</div>
+                    <div class="card-value" id="live-vibratii">-- g</div>
                     <p style="color: var(--text-muted); font-size: 0.85rem;">Prag alertă: > 1.8g</p>
                 </div>
             </div>
@@ -249,7 +249,7 @@
                     <i data-lucide="zap" style="color: var(--success);"></i>
                 </div>
                 <div>
-                    <div class="card-value" id="live-current">-- A</div>
+                    <div class="card-value" id="live-curent">-- A</div>
                     <p style="color: var(--text-muted); font-size: 0.85rem;">Consum nominal de forță</p>
                 </div>
             </div>
@@ -258,16 +258,16 @@
         <div class="main-layout">
             <div class="charts-container">
                 <div class="chart-card">
-                    <h3><i data-lucide="thermometer"></i> Istoric Temperatură Cămașă Motor</h3>
-                    <canvas id="tempChart"></canvas>
+                    <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
+                    <canvas id="temperaturaChart"></canvas>
                 </div>
                 <div class="chart-card">
                     <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (Senzor MEMS)</h3>
-                    <canvas id="vibeChart"></canvas>
+                    <canvas id="vibratiiChart"></canvas>
                 </div>
                 <div class="chart-card">
                     <h3><i data-lucide="zap"></i> Monitorizare Amperaj (Efect Hall)</h3>
-                    <canvas id="currentChart"></canvas>
+                    <canvas id="curentChart"></canvas>
                 </div>
             </div>
 
@@ -278,116 +278,64 @@
         </div>
     </div>
 
-    <script>
-        // Inițializare iconițe Lucide
-        lucide.createIcons();
+   <script type="module">
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-        // Configurații de bază pentru graficele Chart.js
-        const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
-            },
-            plugins: { legend: { display: false } },
-            elements: { line: { tension: 0.3 } }
-        };
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // Generare Grafice
-        const ctxTemp = document.getElementById('tempChart').getContext('2d');
-        const tempChart = new Chart(ctxTemp, {
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true }] },
-            options: chartOptions
-        });
+  const firebaseConfig = {
+    apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
+    authDomain: "panou-de-monitorizare.firebaseapp.com",
+    databaseURL: "https://panou-de-monitorizare-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "panou-de-monitorizare",
+    storageBucket: "panou-de-monitorizare.firebasestorage.app",
+    messagingSenderId: "36180602743",
+    appId: "1:36180602743:web:800afcb32acf59133afb72"
+  };
 
-        const ctxVibe = document.getElementById('vibeChart').getContext('2d');
-        const vibeChart = new Chart(ctxVibe, {
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true }] },
-            options: chartOptions
-        });
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-        const ctxCurrent = document.getElementById('currentChart').getContext('2d');
-        const currentChart = new Chart(ctxCurrent, {
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true }] },
-            options: chartOptions
-        });
+  // Ascultă datele în timp real din Firebase
+  onValue(ref(db, "senzori"), (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
 
-        // Funcție pentru adăugarea alertelor în timp real în panoul din dreapta
-        function addAlert(message, type) {
-            const container = document.getElementById('alert-container');
-            const time = new Date().toLocaleTimeString();
-            const alertItem = document.createElement('div');
-            alertItem.className = `alert-item alert-${type}`;
-            alertItem.innerHTML = `
-                <div><strong>${type === 'danger' ? 'CRITIC' : 'AVERTIZARE'}:</strong> ${message}</div>
-                <div class="alert-time">${time}</div>
-            `;
-            container.insertBefore(alertItem, container.firstChild);
-            
-            if (container.children.length > 8) {
-                container.removeChild(container.lastChild);
-            }
-        }
+    const timeLabel = new Date().toLocaleTimeString([], { 
+      hour: '2-digit', minute: '2-digit', second: '2-digit' 
+    });
 
-        // URL-ul oficial al Worker-ului tău din Cloudflare
-        const WORKER_URL = 'https://dashboard-telematic-iot.dinumadalin112.workers.dev/api/data';
+    const temperatura = parseFloat(data.temperatura || 0).toFixed(1);
+    const vibratii = parseFloat(data.vibratii || 0).toFixed(2);
+    const curent = parseFloat(data.curent || 0).toFixed(1);
 
-        // Preluarea și actualizarea datelor reale din Edge Cloud
-        async function fetchCloudflareData() {
-            try {
-                const response = await fetch(WORKER_URL);
-                const json = await response.json();
-                
-                // Generăm eticheta de timp curentă pentru grafic
-                const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                
-                // Extragerea valorilor sosite din baza de date Cloudflare KV
-                const temp = parseFloat(json.temp || 0).toFixed(1);
-                const vibe = parseFloat(json.vibe || 0).toFixed(2);
-                const current = parseFloat(json.current || 0).toFixed(1);
+    // Alerte
+    if (temperatura > 72.0) addAlert(`Supraîncălzire detectată: ${temperatura}°C`, 'danger');
+    if (vibratii > 1.8) addAlert(`Vibrații peste prag: ${vibratii}g`, 'warning');
 
-                // Verificare praguri și sistem inteligent de alerte active
-                if (temp > 72.0) {
-                    addAlert(`Supraîncălzire detectată la motor: ${temp}°C`, 'danger');
-                }
-                if (vibe > 1.8) {
-                    addAlert(`Vibrații RMS peste pragul critic admis: ${vibe}g`, 'warning');
-                }
+    // Actualizare carduri
+    document.getElementById('live-temperatura').innerText = `${temperatura} °C`;
+    document.getElementById('live-vibratii').innerText = `${vibratii} g`;
+    document.getElementById('live-curent').innerText = `${curent} A`;
 
-                // Actualizare instantanee a cardurilor superioare din UI
-                document.getElementById('live-temp').innerText = `${temp} °C`;
-                document.getElementById('live-vibe').innerText = `${vibe} g`;
-                document.getElementById('live-current').innerText = `${current} A`;
+    // Culori alertă
+    document.getElementById('live-temperatura').style.color = temperatura > 72 ? 'var(--danger)' : 'var(--text-main)';
+    document.getElementById('live-vibratii').style.color = vibratii > 1.8 ? 'var(--warning)' : 'var(--text-main)';
 
-                // Schimbare dinamică a culorilor de alertă vizuală
-                document.getElementById('live-temp').style.color = temp > 72 ? 'var(--danger)' : 'var(--text-main)';
-                document.getElementById('live-vibe').style.color = vibe > 1.8 ? 'var(--warning)' : 'var(--text-main)';
-
-                // Push dinamic de date în cele 3 grafice independente
-                [tempChart, vibeChart, currentChart].forEach((chart, index) => {
-                    const val = index === 0 ? temp : index === 1 ? vibe : current;
-                    chart.data.labels.push(timeLabel);
-                    chart.data.datasets[0].data.push(val);
-                    
-                    // Menținem o fereastră glisantă de maximum 12 puncte pe ecran
-                    if (chart.data.labels.length > 12) {
-                        chart.data.labels.shift();
-                        chart.data.datasets[0].data.shift();
-                    }
-                    chart.update('none'); // Randare ultra-rapidă fără latențe de animație
-                });
-
-            } catch (err) {
-                console.error("Eroare la preluarea datelor din Cloudflare Edge:", err);
-            }
-        }
-
-        // Interogăm backend-ul real la fiecare secundă
-        setInterval(fetchCloudflareData, 1000);
-    </script>
+    // Grafice
+    [temperaturaChart, vibratiiChart, curentChart].forEach((chart, index) => {
+      const val = index === 0 ? temperatura : index === 1 ? vibratii : curent;
+      chart.data.labels.push(timeLabel);
+      chart.data.datasets[0].data.push(val);
+      if (chart.data.labels.length > 12) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.update('none');
+    });
+  });
+</script>
 </body>
 </html>
