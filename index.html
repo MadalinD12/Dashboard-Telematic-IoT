@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Telematică IoT - Licență</title>
+    <title>Dashboard Telematică IoT - Lucrare de Licență</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -216,7 +216,7 @@
             </div>
             <div class="status-badge">
                 <div class="status-dot"></div>
-                <span>ESP32 Connected (Cloudflare Stream)</span>
+                <span>ESP32 Connected (Firebase Realtime Stream)</span>
             </div>
         </header>
 
@@ -278,64 +278,120 @@
         </div>
     </div>
 
-   <script type="module">
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    <script type="module">
+        // Importăm SDK-urile corecte compatibile direct cu rularea în browser (CDN)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        // Inițializare iconițe vectoriale Lucide
+        lucide.createIcons();
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
-    authDomain: "panou-de-monitorizare.firebaseapp.com",
-    databaseURL: "https://panou-de-monitorizare-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "panou-de-monitorizare",
-    storageBucket: "panou-de-monitorizare.firebasestorage.app",
-    messagingSenderId: "36180602743",
-    appId: "1:36180602743:web:800afcb32acf59133afb72"
-  };
+        // Configurații globale de randare pentru cele 3 instanțe Chart.js
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+            },
+            plugins: { legend: { display: false } },
+            elements: { line: { tension: 0.3 } }
+        };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+        // Crearea fizică a graficelor în obiecte JavaScript controlabile
+        const ctxTemp = document.getElementById('temperaturaChart').getContext('2d');
+        const temperaturaChart = new Chart(ctxTemp, {
+            type: 'line',
+            data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true }] },
+            options: chartOptions
+        });
 
-  // Ascultă datele în timp real din Firebase
-  onValue(ref(db, "senzori"), (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
+        const ctxVibe = document.getElementById('vibratiiChart').getContext('2d');
+        const vibratiiChart = new Chart(ctxVibe, {
+            type: 'line',
+            data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true }] },
+            options: chartOptions
+        });
 
-    const timeLabel = new Date().toLocaleTimeString([], { 
-      hour: '2-digit', minute: '2-digit', second: '2-digit' 
-    });
+        const ctxCurrent = document.getElementById('curentChart').getContext('2d');
+        const curentChart = new Chart(ctxCurrent, {
+            type: 'line',
+            data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true }] },
+            options: chartOptions
+        });
 
-    const temperatura = parseFloat(data.temperatura || 0).toFixed(1);
-    const vibratii = parseFloat(data.vibratii || 0).toFixed(2);
-    const curent = parseFloat(data.curent || 0).toFixed(1);
+        // Instanțierea funcției de management al alertelor în panoul lateral
+        function addAlert(message, type) {
+            const container = document.getElementById('alert-container');
+            const time = new Date().toLocaleTimeString();
+            const alertItem = document.createElement('div');
+            alertItem.className = `alert-item alert-${type}`;
+            alertItem.innerHTML = `
+                <div><strong>${type === 'danger' ? 'CRITIC' : 'AVERTIZARE'}:</strong> ${message}</div>
+                <div class="alert-time">${time}</div>
+            `;
+            container.insertBefore(alertItem, container.firstChild);
+            
+            if (container.children.length > 8) {
+                container.removeChild(container.lastChild);
+            }
+        }
 
-    // Alerte
-    if (temperatura > 72.0) addAlert(`Supraîncălzire detectată: ${temperatura}°C`, 'danger');
-    if (vibratii > 1.8) addAlert(`Vibrații peste prag: ${vibratii}g`, 'warning');
+        // Credențialele oficiale ale proiectului tău Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
+            authDomain: "panou-de-monitorizare.firebaseapp.com",
+            databaseURL: "https://panou-de-monitorizare-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "panou-de-monitorizare",
+            storageBucket: "panou-de-monitorizare.firebasestorage.app",
+            messagingSenderId: "36180602743",
+            appId: "1:36180602743:web:800afcb32acf59133afb72"
+        };
 
-    // Actualizare carduri
-    document.getElementById('live-temperatura').innerText = `${temperatura} °C`;
-    document.getElementById('live-vibratii').innerText = `${vibratii} g`;
-    document.getElementById('live-curent').innerText = `${curent} A`;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-    // Culori alertă
-    document.getElementById('live-temperatura').style.color = temperatura > 72 ? 'var(--danger)' : 'var(--text-main)';
-    document.getElementById('live-vibratii').style.color = vibratii > 1.8 ? 'var(--warning)' : 'var(--text-main)';
+        // Conexiune persistentă bidirecțională de tip Stream cu nodul 'senzori'
+        onValue(ref(db, "senzori"), (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
 
-    // Grafice
-    [temperaturaChart, vibratiiChart, curentChart].forEach((chart, index) => {
-      const val = index === 0 ? temperatura : index === 1 ? vibratii : curent;
-      chart.data.labels.push(timeLabel);
-      chart.data.datasets[0].data.push(val);
-      if (chart.data.labels.length > 12) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-      }
-      chart.update('none');
-    });
-  });
-</script>
+            const timeLabel = new Date().toLocaleTimeString([], { 
+                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            });
+
+            // Preluarea exactă a cheilor modificate din consolă (limba română)
+            const temperatura = parseFloat(data.temperatura || 0).toFixed(1);
+            const vibratii = parseFloat(data.vibratii || 0).toFixed(2);
+            const curent = parseFloat(data.curent || 0).toFixed(1);
+
+            // Verificare limite logice și împingere în log
+            if (temperatura > 72.0) addAlert(`Supraîncălzire detectată la motor: ${temperatura}°C`, 'danger');
+            if (vibratii > 1.8) addAlert(`Vibrații RMS peste pragul critic: ${vibratii}g`, 'warning');
+
+            // Actualizarea textelor live din interfață
+            document.getElementById('live-temperatura').innerText = `${temperatura} °C`;
+            document.getElementById('live-vibratii').innerText = `${vibratii} g`;
+            document.getElementById('live-curent').innerText = `${curent} A`;
+
+            // Schimbare dinamică a stilurilor CSS în funcție de starea sistemului
+            document.getElementById('live-temperatura').style.color = temperatura > 72 ? 'var(--danger)' : 'var(--text-main)';
+            document.getElementById('live-vibratii').style.color = vibratii > 1.8 ? 'var(--warning)' : 'var(--text-main)';
+
+            // Desenarea punctelor în vectorii graficelor Chart.js
+            [temperaturaChart, vibratiiChart, curentChart].forEach((chart, index) => {
+                const val = index === 0 ? temperatura : index === 1 ? vibratii : curent;
+                chart.data.labels.push(timeLabel);
+                chart.data.datasets[0].data.push(val);
+                
+                // Efect de fereastră glisantă (derulare continuă spre stânga)
+                if (chart.data.labels.length > 12) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+                chart.update('none'); // Update instant, optimizat hardware
+            });
+        });
+    </script>
 </body>
 </html>
