@@ -29,7 +29,7 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .container {
@@ -37,62 +37,82 @@
             margin: 0 auto;
         }
 
-        /* Header */
+        /* ── HEADER ── */
         header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 0.75rem;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         header h1 {
-            font-size: 1.8rem;
+            font-size: clamp(1.1rem, 4vw, 1.8rem);
             font-weight: 600;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
         }
 
         header h1 span {
             color: var(--primary);
         }
 
+        .header-sub {
+            color: var(--text-muted);
+            font-size: clamp(0.7rem, 2.5vw, 0.875rem);
+            margin-top: 0.2rem;
+        }
+
         .status-badge {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             background: #1e293b;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.75rem;
             border-radius: 9999px;
             border: 1px solid var(--border);
-            font-size: 0.875rem;
+            font-size: clamp(0.65rem, 2vw, 0.8rem);
+            white-space: nowrap;
+            flex-shrink: 0;
+            align-self: flex-start;
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
+            min-width: 7px;
             background-color: var(--success);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
 
-        /* Grid-ul de Carduri cu valori Live */
+        /* ── METRICS GRID ── */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .card {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 0.75rem;
-            padding: 1.5rem;
+            padding: 1.1rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             transition: transform 0.2s;
+            min-width: 0;
         }
 
         .card:hover {
@@ -104,21 +124,35 @@
             justify-content: space-between;
             align-items: center;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 0.6rem;
+            gap: 0.5rem;
         }
 
         .card-title {
-            font-size: 1rem;
+            font-size: clamp(0.7rem, 2vw, 0.95rem);
             font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .card-icon {
+            flex-shrink: 0;
+            width: clamp(14px, 3vw, 20px);
+            height: clamp(14px, 3vw, 20px);
         }
 
         .card-value {
-            font-size: 2.25rem;
+            font-size: clamp(1.3rem, 5vw, 2.25rem);
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
+            line-height: 1.1;
         }
 
-        /* Secțiunea de Grafice și Alerte */
+        .card-desc {
+            color: var(--text-muted);
+            font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+        }
+
+        /* ── MAIN LAYOUT ── */
         .main-layout {
             display: grid;
             grid-template-columns: 3fr 1fr;
@@ -128,270 +162,357 @@
         .charts-container {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .chart-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 0.75rem;
-            padding: 1.5rem;
-            height: 350px;
+            padding: 1.25rem;
+            height: 300px;
         }
 
         .chart-card h3 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            margin-bottom: 0.75rem;
             color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            line-height: 1.3;
         }
 
+        .chart-card canvas {
+            max-height: 220px;
+        }
+
+        /* ── ALERTS ── */
         .alerts-panel {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 0.75rem;
-            padding: 1.5rem;
-            max-height: 1080px;
+            padding: 1.25rem;
             overflow-y: auto;
         }
 
         .alerts-panel h2 {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
+            font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .alert-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .alert-item {
-            padding: 1rem;
+            padding: 0.75rem;
             border-radius: 0.5rem;
             border-left: 4px solid transparent;
             background: rgba(15, 23, 42, 0.4);
-            font-size: 0.875rem;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
             animation: fadeIn 0.3s ease-in;
+            line-height: 1.4;
         }
 
-        .alert-danger { border-left-color: var(--danger); color: #fca5a5; }
+        .alert-danger  { border-left-color: var(--danger);  color: #fca5a5; }
         .alert-warning { border-left-color: var(--warning); color: #fde047; }
 
         .alert-time {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
-            margin-top: 0.25rem;
+            margin-top: 0.2rem;
         }
 
+        /* ── ANIMATIONS ── */
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70%  { transform: scale(1);    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 1024px) {
-            .main-layout { grid-template-columns: 1fr; }
-            body { padding: 1rem; }
+        /* ── RESPONSIVE: TABLET ── */
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .alerts-panel {
+                max-height: 360px;
+            }
+
+            .chart-card {
+                height: 280px;
+            }
+        }
+
+        /* ── RESPONSIVE: MOBILE ── */
+        @media (max-width: 600px) {
+            body {
+                padding: 0.85rem;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.6rem;
+            }
+
+            .status-badge {
+                font-size: 0.7rem;
+                padding: 0.35rem 0.65rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .card {
+                padding: 1rem 1.1rem;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 1rem;
+            }
+
+            .card-header {
+                margin-bottom: 0;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.2rem;
+            }
+
+            .card-body {
+                margin-left: auto;
+                text-align: right;
+            }
+
+            .card-value {
+                font-size: 1.75rem;
+                margin-bottom: 0.15rem;
+            }
+
+            .chart-card {
+                height: 240px;
+                padding: 1rem;
+            }
+
+            .chart-card h3 {
+                font-size: 0.78rem;
+            }
+
+            .chart-card canvas {
+                max-height: 170px;
+            }
+
+            .main-layout {
+                gap: 0.85rem;
+            }
+
+            .charts-container {
+                gap: 0.85rem;
+            }
+
+            .alerts-panel {
+                max-height: 300px;
+            }
+        }
+
+        /* ── RESPONSIVE: SMALL MOBILE ── */
+        @media (max-width: 380px) {
+            .card-value {
+                font-size: 1.5rem;
+            }
+
+            .chart-card {
+                height: 210px;
+            }
         }
     </style>
 </head>
 <body>
+<div class="container">
 
-    <div class="container">
-        <header>
+    <header>
+        <div class="header-top">
             <div>
                 <h1>Monitorizare Vehicul <span>[Platformă IoT]</span></h1>
-                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Sistem de analiză predictivă pe arhitectură Edge-Cloud</p>
+                <p class="header-sub">Sistem de analiză predictivă pe arhitectură Edge-Cloud</p>
             </div>
             <div class="status-badge">
                 <div class="status-dot"></div>
-                <span>ESP32 Connected (Firebase Realtime Stream)</span>
+                <span>ESP32 Connected</span>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <div class="metrics-grid">
-            <div class="card" style="border-top: 4px solid var(--primary);">
-                <div class="card-header">
-                    <span class="card-title">Regim Termic Motor</span>
-                    <i data-lucide="thermometer" style="color: var(--primary);"></i>
-                </div>
-                <div>
-                    <div class="card-value" id="live-temperatura">-- °C</div>
-                    <p style="color: var(--text-muted); font-size: 0.85rem;">Prag critic: > 72.0°C</p>
-                </div>
+    <div class="metrics-grid">
+        <div class="card" style="border-top: 4px solid var(--primary);">
+            <div class="card-header">
+                <span class="card-title">Regim Termic Motor</span>
+                <i data-lucide="thermometer" class="card-icon" style="color: var(--primary);"></i>
             </div>
-
-            <div class="card" style="border-top: 4px solid var(--warning);">
-                <div class="card-header">
-                    <span class="card-title">Nivel Vibrații (RMS)</span>
-                    <i data-lucide="activity" style="color: var(--warning);"></i>
-                </div>
-                <div>
-                    <div class="card-value" id="live-vibratii">-- g</div>
-                    <p style="color: var(--text-muted); font-size: 0.85rem;">Prag alertă: > 1.8g</p>
-                </div>
-            </div>
-
-            <div class="card" style="border-top: 4px solid var(--success);">
-                <div class="card-header">
-                    <span class="card-title">Curent Absorbit</span>
-                    <i data-lucide="zap" style="color: var(--success);"></i>
-                </div>
-                <div>
-                    <div class="card-value" id="live-curent">-- A</div>
-                    <p style="color: var(--text-muted); font-size: 0.85rem;">Consum nominal de forță</p>
-                </div>
+            <div class="card-body">
+                <div class="card-value" id="live-temperatura">-- °C</div>
+                <p class="card-desc">Prag critic: &gt; 72.0°C</p>
             </div>
         </div>
 
-        <div class="main-layout">
-            <div class="charts-container">
-                <div class="chart-card">
-                    <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
-                    <canvas id="temperaturaChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (Senzor MEMS)</h3>
-                    <canvas id="vibratiiChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3><i data-lucide="zap"></i> Monitorizare Amperaj (Efect Hall)</h3>
-                    <canvas id="curentChart"></canvas>
-                </div>
+        <div class="card" style="border-top: 4px solid var(--warning);">
+            <div class="card-header">
+                <span class="card-title">Nivel Vibrații (RMS)</span>
+                <i data-lucide="activity" class="card-icon" style="color: var(--warning);"></i>
             </div>
+            <div class="card-body">
+                <div class="card-value" id="live-vibratii">-- g</div>
+                <p class="card-desc">Prag alertă: &gt; 1.8g</p>
+            </div>
+        </div>
 
-            <div class="alerts-panel">
-                <h2><i data-lucide="bell" style="color: var(--danger);"></i> Jurnal Alerte Anomalii</h2>
-                <div class="alert-list" id="alert-container"></div>
+        <div class="card" style="border-top: 4px solid var(--success);">
+            <div class="card-header">
+                <span class="card-title">Tensiune Baterie</span>
+                <i data-lucide="zap" class="card-icon" style="color: var(--success);"></i>
+            </div>
+            <div class="card-body">
+                <div class="card-value" id="live-curent">-- V</div>
+                <p class="card-desc">Nominal: 12.6V (motor oprit)</p>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        // Importăm SDK-urile corecte compatibile direct cu rularea în browser (CDN)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    <div class="main-layout">
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
+                <canvas id="temperaturaChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (Senzor MEMS)</h3>
+                <canvas id="vibratiiChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i data-lucide="zap"></i> Monitorizare Tensiune Baterie (Divizor tensiune)</h3>
+                <canvas id="curentChart"></canvas>
+            </div>
+        </div>
 
-        // Inițializare iconițe vectoriale Lucide
-        lucide.createIcons();
+        <div class="alerts-panel">
+            <h2><i data-lucide="bell" style="color: var(--danger);"></i> Jurnal Alerte</h2>
+            <div class="alert-list" id="alert-container"></div>
+        </div>
+    </div>
 
-        // Configurații globale de randare pentru cele 3 instanțe Chart.js
-        const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
-            },
-            plugins: { legend: { display: false } },
-            elements: { line: { tension: 0.3 } }
-        };
+</div>
 
-        // Crearea fizică a graficelor în obiecte JavaScript controlabile
-        const ctxTemp = document.getElementById('temperaturaChart').getContext('2d');
-        const temperaturaChart = new Chart(ctxTemp, {
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true }] },
-            options: chartOptions
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    lucide.createIcons();
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', maxRotation: 0, font: { size: 10 } } },
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+        },
+        plugins: { legend: { display: false } },
+        elements: { line: { tension: 0.3 } }
+    };
+
+    const ctxTemp = document.getElementById('temperaturaChart').getContext('2d');
+    const temperaturaChart = new Chart(ctxTemp, {
+        type: 'line',
+        data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true }] },
+        options: chartOptions
+    });
+
+    const ctxVibe = document.getElementById('vibratiiChart').getContext('2d');
+    const vibratiiChart = new Chart(ctxVibe, {
+        type: 'line',
+        data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true }] },
+        options: chartOptions
+    });
+
+    const ctxCurrent = document.getElementById('curentChart').getContext('2d');
+    const curentChart = new Chart(ctxCurrent, {
+        type: 'line',
+        data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true }] },
+        options: chartOptions
+    });
+
+    function addAlert(message, type) {
+        const container = document.getElementById('alert-container');
+        const time = new Date().toLocaleTimeString();
+        const alertItem = document.createElement('div');
+        alertItem.className = `alert-item alert-${type}`;
+        alertItem.innerHTML = `
+            <div><strong>${type === 'danger' ? 'CRITIC' : 'AVERTIZARE'}:</strong> ${message}</div>
+            <div class="alert-time">${time}</div>
+        `;
+        container.insertBefore(alertItem, container.firstChild);
+        if (container.children.length > 8) container.removeChild(container.lastChild);
+    }
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
+        authDomain: "panou-de-monitorizare.firebaseapp.com",
+        databaseURL: "https://panou-de-monitorizare-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "panou-de-monitorizare",
+        storageBucket: "panou-de-monitorizare.firebasestorage.app",
+        messagingSenderId: "36180602743",
+        appId: "1:36180602743:web:800afcb32acf59133afb72"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    onValue(ref(db, "senzori"), (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const timeLabel = new Date().toLocaleTimeString([], {
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
 
-        const ctxVibe = document.getElementById('vibratiiChart').getContext('2d');
-        const vibratiiChart = new Chart(ctxVibe, {
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true }] },
-            options: chartOptions
-        });
+        const temperatura = parseFloat(data.temperatura || 0).toFixed(1);
+        const vibratii    = parseFloat(data.vibratii    || 0).toFixed(2);
+        const curent      = parseFloat(data.curent      || 0).toFixed(1);
 
-        const ctxCurrent = document.getElementById('curentChart').getContext('2d');
-        const curentChart = new Chart(ctxCurrent, {
-            type: 'line',
-            data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true }] },
-            options: chartOptions
-        });
+        if (temperatura > 72.0) addAlert(`Supraîncălzire detectată la motor: ${temperatura}°C`, 'danger');
+        if (vibratii    > 1.8)  addAlert(`Vibrații RMS peste pragul critic: ${vibratii}g`, 'warning');
 
-        // Instanțierea funcției de management al alertelor în panoul lateral
-        function addAlert(message, type) {
-            const container = document.getElementById('alert-container');
-            const time = new Date().toLocaleTimeString();
-            const alertItem = document.createElement('div');
-            alertItem.className = `alert-item alert-${type}`;
-            alertItem.innerHTML = `
-                <div><strong>${type === 'danger' ? 'CRITIC' : 'AVERTIZARE'}:</strong> ${message}</div>
-                <div class="alert-time">${time}</div>
-            `;
-            container.insertBefore(alertItem, container.firstChild);
-            
-            if (container.children.length > 8) {
-                container.removeChild(container.lastChild);
+        document.getElementById('live-temperatura').innerText = `${temperatura} °C`;
+        document.getElementById('live-vibratii').innerText    = `${vibratii} g`;
+        document.getElementById('live-curent').innerText      = `${curent} V`;
+
+        document.getElementById('live-temperatura').style.color = temperatura > 72  ? 'var(--danger)'  : 'var(--text-main)';
+        document.getElementById('live-vibratii').style.color    = vibratii    > 1.8 ? 'var(--warning)' : 'var(--text-main)';
+
+        [temperaturaChart, vibratiiChart, curentChart].forEach((chart, i) => {
+            const val = i === 0 ? temperatura : i === 1 ? vibratii : curent;
+            chart.data.labels.push(timeLabel);
+            chart.data.datasets[0].data.push(val);
+            if (chart.data.labels.length > 12) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
             }
-        }
-
-        // Credențialele oficiale ale proiectului tău Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
-            authDomain: "panou-de-monitorizare.firebaseapp.com",
-            databaseURL: "https://panou-de-monitorizare-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "panou-de-monitorizare",
-            storageBucket: "panou-de-monitorizare.firebasestorage.app",
-            messagingSenderId: "36180602743",
-            appId: "1:36180602743:web:800afcb32acf59133afb72"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // Conexiune persistentă bidirecțională de tip Stream cu nodul 'senzori'
-        onValue(ref(db, "senzori"), (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return;
-
-            const timeLabel = new Date().toLocaleTimeString([], { 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            });
-
-            // Preluarea exactă a cheilor modificate din consolă (limba română)
-            const temperatura = parseFloat(data.temperatura || 0).toFixed(1);
-            const vibratii = parseFloat(data.vibratii || 0).toFixed(2);
-            const curent = parseFloat(data.curent || 0).toFixed(1);
-
-            // Verificare limite logice și împingere în log
-            if (temperatura > 72.0) addAlert(`Supraîncălzire detectată la motor: ${temperatura}°C`, 'danger');
-            if (vibratii > 1.8) addAlert(`Vibrații RMS peste pragul critic: ${vibratii}g`, 'warning');
-
-            // Actualizarea textelor live din interfață
-            document.getElementById('live-temperatura').innerText = `${temperatura} °C`;
-            document.getElementById('live-vibratii').innerText = `${vibratii} g`;
-            document.getElementById('live-curent').innerText = `${curent} A`;
-
-            // Schimbare dinamică a stilurilor CSS în funcție de starea sistemului
-            document.getElementById('live-temperatura').style.color = temperatura > 72 ? 'var(--danger)' : 'var(--text-main)';
-            document.getElementById('live-vibratii').style.color = vibratii > 1.8 ? 'var(--warning)' : 'var(--text-main)';
-
-            // Desenarea punctelor în vectorii graficelor Chart.js
-            [temperaturaChart, vibratiiChart, curentChart].forEach((chart, index) => {
-                const val = index === 0 ? temperatura : index === 1 ? vibratii : curent;
-                chart.data.labels.push(timeLabel);
-                chart.data.datasets[0].data.push(val);
-                
-                // Efect de fereastră glisantă (derulare continuă spre stânga)
-                if (chart.data.labels.length > 12) {
-                    chart.data.labels.shift();
-                    chart.data.datasets[0].data.shift();
-                }
-                chart.update('none'); // Update instant, optimizat hardware
-            });
+            chart.update('none');
         });
-    </script>
+    });
+</script>
 </body>
 </html>
