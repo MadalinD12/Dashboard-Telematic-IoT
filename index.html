@@ -249,7 +249,7 @@
     lucide.createIcons();
 
     // Prag detectare motor pornit (V)
-    const PRAG_MOTOR_PORNIT = 13.5;
+    const PRAG_MOTOR_PORNIT = 13.8;
 
     const chartOptions = {
         responsive: true,
@@ -379,7 +379,9 @@
         // Alertă baterie descărcată (indiferent de starea motorului)
         if (vNum < 12.0)
             addAlert(`Tensiune baterie scăzută: ${tensiune}V`, 'danger');
-
+        // Alertă tensiune prea mare
+        if (vNum > 15.0)
+            addAlert(`Tensiune baterie crescută: ${tensiune}V`, 'warning');
         // Grafice — temperatură și vibrații doar când motorul e pornit
         if (motorPornit) {
             [temperaturaChart, vibratiiChart].forEach((chart, i) => {
