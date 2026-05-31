@@ -153,12 +153,12 @@
             <div class="chart-card" id="chart-temp">
                 <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
                 <canvas id="temperaturaChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
             </div>
             <div class="chart-card" id="chart-vib">
                 <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (medie 10 citiri)</h3>
                 <canvas id="vibratiiChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
             </div>
             <div class="chart-card">
                 <h3><i data-lucide="zap"></i> Monitorizare Tensiune Baterie (Divizor tensiune)</h3>
@@ -181,17 +181,17 @@
     lucide.createIcons();
 
     // ── Praguri sistem ───────────────────────────────────────
-    const PRAG_MOTOR_PORNIT         = 13.8;  // V — peste asta = motor pornit
+    const PRAG_MOTOR_PORNIT         = 13.8;  // V peste asta = motor pornit
 
-    const PRAG_TEMP_AVERTIZARE      = 80.0;  // °C — furtun răcire
-    const PRAG_TEMP_CRITIC          = 90.0;  // °C — furtun răcire
+    const PRAG_TEMP_AVERTIZARE      = 80.0;  // °C furtun răcire
+    const PRAG_TEMP_CRITIC          = 90.0;  // °C furtun răcire
 
-    const PRAG_VIB_AVERTIZARE       = 4.0;   // g — medie 10 citiri
-    const PRAG_VIB_CRITIC           = 6.0;   // g — medie 10 citiri
+    const PRAG_VIB_AVERTIZARE       = 4.0;   // g medie 10 citiri
+    const PRAG_VIB_CRITIC           = 6.0;   // g medie 10 citiri
 
     const PRAG_BATERIE_DESCARCATA   = 12.0;  // V
-    const PRAG_TENSIUNE_RIDICATA    = 14.4;  // V — avertizare regulator
-    const PRAG_SUPRATENSIUNE        = 15.0;  // V — pericol
+    const PRAG_TENSIUNE_RIDICATA    = 14.4;  // V avertizare regulator
+    const PRAG_SUPRATENSIUNE        = 15.0;  // V pericol
 
     // ── Istoric vibrații pentru medie ────────────────────────
     const istoricVibratii = [];
@@ -340,7 +340,7 @@
         if (tensiune < PRAG_BATERIE_DESCARCATA)
             addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger');
         else if (tensiune > PRAG_SUPRATENSIUNE)
-            addAlert(`Supratensiune — regulator defect: ${tensiune.toFixed(2)}V`, 'danger');
+            addAlert(`Supratensiune, regulator defect: ${tensiune.toFixed(2)}V`, 'danger');
         else if (tensiune > PRAG_TENSIUNE_RIDICATA)
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning');
 
