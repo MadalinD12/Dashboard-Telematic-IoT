@@ -19,325 +19,143 @@
             --border: #334155;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            padding: 1.5rem;
-        }
+        body { background-color: var(--bg-dark); color: var(--text-main); padding: 1.5rem; }
+        .container { max-width: 1400px; margin: 0 auto; }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* ── HEADER ── */
         header {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.25rem;
-            margin-bottom: 1.5rem;
+            display: flex; flex-direction: column; gap: 0.75rem;
+            border-bottom: 1px solid var(--border); padding-bottom: 1.25rem; margin-bottom: 1.5rem;
         }
-
         .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            flex-wrap: wrap;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 1rem; flex-wrap: wrap;
         }
+        header h1 { font-size: clamp(1.1rem, 4vw, 1.8rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.2; }
+        header h1 span { color: var(--primary); }
+        .header-sub { color: var(--text-muted); font-size: clamp(0.7rem, 2.5vw, 0.875rem); margin-top: 0.2rem; }
 
-        header h1 {
-            font-size: clamp(1.1rem, 4vw, 1.8rem);
-            font-weight: 600;
-            letter-spacing: -0.03em;
-            line-height: 1.2;
-        }
-
-        header h1 span {
-            color: var(--primary);
-        }
-
-        .header-sub {
-            color: var(--text-muted);
-            font-size: clamp(0.7rem, 2.5vw, 0.875rem);
-            margin-top: 0.2rem;
-        }
+        .header-badges { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 
         .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: #1e293b;
-            padding: 0.4rem 0.75rem;
-            border-radius: 9999px;
-            border: 1px solid var(--border);
-            font-size: clamp(0.65rem, 2vw, 0.8rem);
-            white-space: nowrap;
-            flex-shrink: 0;
-            align-self: flex-start;
+            display: flex; align-items: center; gap: 0.4rem;
+            background: #1e293b; padding: 0.4rem 0.75rem; border-radius: 9999px;
+            border: 1px solid var(--border); font-size: clamp(0.65rem, 2vw, 0.8rem);
+            white-space: nowrap; flex-shrink: 0;
         }
-
         .status-dot {
-            width: 7px;
-            height: 7px;
-            min-width: 7px;
-            background-color: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
+            width: 7px; height: 7px; min-width: 7px;
+            background-color: var(--success); border-radius: 50%; animation: pulse 2s infinite;
         }
 
-        /* ── METRICS GRID ── */
+        /* Badge status motor */
+        .motor-badge {
+            display: flex; align-items: center; gap: 0.4rem;
+            padding: 0.4rem 0.75rem; border-radius: 9999px;
+            border: 1px solid var(--border); font-size: clamp(0.65rem, 2vw, 0.8rem);
+            white-space: nowrap; font-weight: 600; transition: all 0.3s;
+        }
+        .motor-badge.pornit  { background: rgba(16,185,129,0.15); border-color: var(--success); color: var(--success); }
+        .motor-badge.oprit   { background: rgba(148,163,184,0.1);  border-color: var(--border);  color: var(--text-muted); }
+        .motor-dot { width: 7px; height: 7px; min-width: 7px; border-radius: 50%; }
+        .motor-badge.pornit .motor-dot { background: var(--success); animation: pulse 2s infinite; }
+        .motor-badge.oprit  .motor-dot { background: var(--text-muted); }
+
         .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 1rem; margin-bottom: 1.5rem;
         }
-
         .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s;
-            min-width: 0;
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 0.75rem; padding: 1.1rem;
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.2s; min-width: 0;
         }
-
-        .card:hover {
-            transform: translateY(-2px);
-        }
-
+        .card:hover { transform: translateY(-2px); }
         .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--text-muted);
-            margin-bottom: 0.6rem;
-            gap: 0.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--text-muted); margin-bottom: 0.6rem; gap: 0.5rem;
         }
+        .card-title { font-size: clamp(0.7rem, 2vw, 0.95rem); font-weight: 500; line-height: 1.3; }
+        .card-icon  { flex-shrink: 0; width: clamp(14px, 3vw, 20px); height: clamp(14px, 3vw, 20px); }
+        .card-value { font-size: clamp(1.3rem, 5vw, 2.25rem); font-weight: 700; margin-bottom: 0.3rem; line-height: 1.1; }
+        .card-desc  { color: var(--text-muted); font-size: clamp(0.6rem, 1.8vw, 0.8rem); }
 
-        .card-title {
-            font-size: clamp(0.7rem, 2vw, 0.95rem);
-            font-weight: 500;
-            line-height: 1.3;
-        }
-
-        .card-icon {
-            flex-shrink: 0;
-            width: clamp(14px, 3vw, 20px);
-            height: clamp(14px, 3vw, 20px);
-        }
-
-        .card-value {
-            font-size: clamp(1.3rem, 5vw, 2.25rem);
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            line-height: 1.1;
-        }
-
-        .card-desc {
-            color: var(--text-muted);
-            font-size: clamp(0.6rem, 1.8vw, 0.8rem);
-        }
-
-        /* ── MAIN LAYOUT ── */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .charts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
+        .main-layout { display: grid; grid-template-columns: 3fr 1fr; gap: 1.5rem; }
+        .charts-container { display: flex; flex-direction: column; gap: 1.25rem; }
         .chart-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            height: 300px;
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 0.75rem; padding: 1.25rem; height: 300px;
         }
-
         .chart-card h3 {
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
-            margin-bottom: 0.75rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            line-height: 1.3;
+            font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.75rem;
+            color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; line-height: 1.3;
         }
+        .chart-card canvas { max-height: 220px; }
 
-        .chart-card canvas {
-            max-height: 220px;
-        }
-
-        /* ── ALERTS ── */
         .alerts-panel {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            overflow-y: auto;
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 0.75rem; padding: 1.25rem; overflow-y: auto;
         }
-
         .alerts-panel h2 {
-            font-size: clamp(0.85rem, 2.5vw, 1.1rem);
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
+            font-size: clamp(0.85rem, 2.5vw, 1.1rem); margin-bottom: 1.25rem;
+            display: flex; align-items: center; gap: 0.4rem;
         }
-
-        .alert-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
+        .alert-list { display: flex; flex-direction: column; gap: 0.75rem; }
         .alert-item {
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            border-left: 4px solid transparent;
-            background: rgba(15, 23, 42, 0.4);
-            font-size: clamp(0.7rem, 2vw, 0.85rem);
-            animation: fadeIn 0.3s ease-in;
-            line-height: 1.4;
+            padding: 0.75rem; border-radius: 0.5rem; border-left: 4px solid transparent;
+            background: rgba(15,23,42,0.4); font-size: clamp(0.7rem, 2vw, 0.85rem);
+            animation: fadeIn 0.3s ease-in; line-height: 1.4;
         }
-
         .alert-danger  { border-left-color: var(--danger);  color: #fca5a5; }
         .alert-warning { border-left-color: var(--warning); color: #fde047; }
+        .alert-info    { border-left-color: var(--primary); color: #93c5fd; }
+        .alert-time    { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; }
 
-        .alert-time {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 0.2rem;
+        /* Overlay motor oprit pe grafice */
+        .chart-overlay {
+            display: none; position: absolute; inset: 0;
+            background: rgba(15,23,42,0.6); border-radius: 0.75rem;
+            align-items: center; justify-content: center;
+            font-size: 0.85rem; color: var(--text-muted); gap: 0.4rem;
         }
+        .chart-card { position: relative; }
+        .chart-card.motor-off .chart-overlay { display: flex; }
 
-        /* ── ANIMATIONS ── */
         @keyframes pulse {
-            0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70%  { transform: scale(1);    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
+            70%  { transform: scale(1);    box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16,185,129,0); }
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-8px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── RESPONSIVE: TABLET ── */
         @media (max-width: 900px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .alerts-panel {
-                max-height: 360px;
-            }
-
-            .chart-card {
-                height: 280px;
-            }
+            .main-layout { grid-template-columns: 1fr; }
+            .alerts-panel { max-height: 360px; }
+            .chart-card { height: 280px; }
         }
-
-        /* ── RESPONSIVE: MOBILE ── */
         @media (max-width: 600px) {
-            body {
-                padding: 0.85rem;
-            }
-
-            .header-top {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.6rem;
-            }
-
-            .status-badge {
-                font-size: 0.7rem;
-                padding: 0.35rem 0.65rem;
-            }
-
-            .metrics-grid {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
-
-            .card {
-                padding: 1rem 1.1rem;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                gap: 1rem;
-            }
-
-            .card-header {
-                margin-bottom: 0;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.2rem;
-            }
-
-            .card-body {
-                margin-left: auto;
-                text-align: right;
-            }
-
-            .card-value {
-                font-size: 1.75rem;
-                margin-bottom: 0.15rem;
-            }
-
-            .chart-card {
-                height: 240px;
-                padding: 1rem;
-            }
-
-            .chart-card h3 {
-                font-size: 0.78rem;
-            }
-
-            .chart-card canvas {
-                max-height: 170px;
-            }
-
-            .main-layout {
-                gap: 0.85rem;
-            }
-
-            .charts-container {
-                gap: 0.85rem;
-            }
-
-            .alerts-panel {
-                max-height: 300px;
-            }
+            body { padding: 0.85rem; }
+            .header-top { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+            .metrics-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+            .card { padding: 1rem 1.1rem; flex-direction: row; align-items: center; gap: 1rem; }
+            .card-header { margin-bottom: 0; flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+            .card-body { margin-left: auto; text-align: right; }
+            .card-value { font-size: 1.75rem; margin-bottom: 0.15rem; }
+            .chart-card { height: 240px; padding: 1rem; }
+            .chart-card h3 { font-size: 0.78rem; }
+            .chart-card canvas { max-height: 170px; }
+            .main-layout { gap: 0.85rem; }
+            .charts-container { gap: 0.85rem; }
+            .alerts-panel { max-height: 300px; }
         }
-
-        /* ── RESPONSIVE: SMALL MOBILE ── */
         @media (max-width: 380px) {
-            .card-value {
-                font-size: 1.5rem;
-            }
-
-            .chart-card {
-                height: 210px;
-            }
+            .card-value { font-size: 1.5rem; }
+            .chart-card { height: 210px; }
         }
     </style>
 </head>
@@ -350,9 +168,15 @@
                 <h1>Monitorizare Vehicul <span>[Platformă IoT]</span></h1>
                 <p class="header-sub">Sistem de analiză predictivă pe arhitectură Edge-Cloud</p>
             </div>
-            <div class="status-badge">
-                <div class="status-dot"></div>
-                <span>ESP32 Connected</span>
+            <div class="header-badges">
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span>ESP32 Connected</span>
+                </div>
+                <div class="motor-badge oprit" id="motor-badge">
+                    <div class="motor-dot"></div>
+                    <span id="motor-text">Motor oprit</span>
+                </div>
             </div>
         </div>
     </header>
@@ -386,25 +210,27 @@
                 <i data-lucide="zap" class="card-icon" style="color: var(--success);"></i>
             </div>
             <div class="card-body">
-                <div class="card-value" id="live-curent">-- V</div>
-                <p class="card-desc">Nominal: 12.6V (motor oprit)</p>
+                <div class="card-value" id="live-tensiune">-- V</div>
+                <p class="card-desc" id="tensiune-desc">Nominal: 12.6V (motor oprit)</p>
             </div>
         </div>
     </div>
 
     <div class="main-layout">
         <div class="charts-container">
-            <div class="chart-card">
+            <div class="chart-card" id="chart-temp">
                 <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
                 <canvas id="temperaturaChart"></canvas>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
             </div>
-            <div class="chart-card">
+            <div class="chart-card" id="chart-vib">
                 <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (Senzor MEMS)</h3>
                 <canvas id="vibratiiChart"></canvas>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
             </div>
             <div class="chart-card">
                 <h3><i data-lucide="zap"></i> Monitorizare Tensiune Baterie (Divizor tensiune)</h3>
-                <canvas id="curentChart"></canvas>
+                <canvas id="tensiuneChart"></canvas>
             </div>
         </div>
 
@@ -422,6 +248,9 @@
 
     lucide.createIcons();
 
+    // Prag detectare motor pornit (V)
+    const PRAG_MOTOR_PORNIT = 13.5;
+
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -433,22 +262,22 @@
         elements: { line: { tension: 0.3 } }
     };
 
-    const ctxTemp = document.getElementById('temperaturaChart').getContext('2d');
-    const temperaturaChart = new Chart(ctxTemp, {
+    const temperaturaChart = new Chart(
+        document.getElementById('temperaturaChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true }] },
         options: chartOptions
     });
 
-    const ctxVibe = document.getElementById('vibratiiChart').getContext('2d');
-    const vibratiiChart = new Chart(ctxVibe, {
+    const vibratiiChart = new Chart(
+        document.getElementById('vibratiiChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true }] },
         options: chartOptions
     });
 
-    const ctxCurrent = document.getElementById('curentChart').getContext('2d');
-    const curentChart = new Chart(ctxCurrent, {
+    const tensiuneChart = new Chart(
+        document.getElementById('tensiuneChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true }] },
         options: chartOptions
@@ -460,11 +289,33 @@
         const alertItem = document.createElement('div');
         alertItem.className = `alert-item alert-${type}`;
         alertItem.innerHTML = `
-            <div><strong>${type === 'danger' ? 'CRITIC' : 'AVERTIZARE'}:</strong> ${message}</div>
+            <div><strong>${type === 'danger' ? 'CRITIC' : type === 'warning' ? 'AVERTIZARE' : 'INFO'}:</strong> ${message}</div>
             <div class="alert-time">${time}</div>
         `;
         container.insertBefore(alertItem, container.firstChild);
-        if (container.children.length > 8) container.removeChild(container.lastChild);
+        if (container.children.length > 10) container.removeChild(container.lastChild);
+    }
+
+    function actualizeazaMotor(motorPornit) {
+        const badge     = document.getElementById('motor-badge');
+        const text      = document.getElementById('motor-text');
+        const descTens  = document.getElementById('tensiune-desc');
+        const chartTemp = document.getElementById('chart-temp');
+        const chartVib  = document.getElementById('chart-vib');
+
+        if (motorPornit) {
+            badge.className = 'motor-badge pornit';
+            text.textContent = 'Motor pornit';
+            descTens.textContent = 'Nominal: 13.8–14.4V (motor pornit)';
+            chartTemp.classList.remove('motor-off');
+            chartVib.classList.remove('motor-off');
+        } else {
+            badge.className = 'motor-badge oprit';
+            text.textContent = 'Motor oprit';
+            descTens.textContent = 'Nominal: 12.6V (motor oprit)';
+            chartTemp.classList.add('motor-off');
+            chartVib.classList.add('motor-off');
+        }
     }
 
     const firebaseConfig = {
@@ -478,7 +329,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    const db  = getDatabase(app);
 
     onValue(ref(db, "senzori"), (snapshot) => {
         const data = snapshot.val();
@@ -490,28 +341,67 @@
 
         const temperatura = parseFloat(data.temperatura || 0).toFixed(1);
         const vibratii    = parseFloat(data.vibratii    || 0).toFixed(2);
-        const curent      = parseFloat(data.curent      || 0).toFixed(1);
+        const tensiune    = parseFloat(data.tensiune    || 0).toFixed(2);
 
-        if (temperatura > 72.0) addAlert(`Supraîncălzire detectată la motor: ${temperatura}°C`, 'danger');
-        if (vibratii    > 1.8)  addAlert(`Vibrații RMS peste pragul critic: ${vibratii}g`, 'warning');
+        const motorPornit = parseFloat(tensiune) > PRAG_MOTOR_PORNIT;
 
+        // Actualizare UI carduri
         document.getElementById('live-temperatura').innerText = `${temperatura} °C`;
         document.getElementById('live-vibratii').innerText    = `${vibratii} g`;
-        document.getElementById('live-curent').innerText      = `${curent} V`;
+        document.getElementById('live-tensiune').innerText    = `${tensiune} V`;
 
-        document.getElementById('live-temperatura').style.color = temperatura > 72  ? 'var(--danger)'  : 'var(--text-main)';
-        document.getElementById('live-vibratii').style.color    = vibratii    > 1.8 ? 'var(--warning)' : 'var(--text-main)';
+        // Culori dinamice tensiune
+        const vNum = parseFloat(tensiune);
+        document.getElementById('live-tensiune').style.color =
+            vNum < 12.0 ? 'var(--danger)' :
+            vNum > 15.0 ? 'var(--warning)' : 'var(--text-main)';
 
-        [temperaturaChart, vibratiiChart, curentChart].forEach((chart, i) => {
-            const val = i === 0 ? temperatura : i === 1 ? vibratii : curent;
-            chart.data.labels.push(timeLabel);
-            chart.data.datasets[0].data.push(val);
-            if (chart.data.labels.length > 12) {
-                chart.data.labels.shift();
-                chart.data.datasets[0].data.shift();
-            }
-            chart.update('none');
-        });
+        // Actualizare badge motor
+        actualizeazaMotor(motorPornit);
+
+        // Alerte — doar când motorul e pornit
+        if (motorPornit) {
+            document.getElementById('live-temperatura').style.color =
+                temperatura > 72 ? 'var(--danger)' : 'var(--text-main)';
+            document.getElementById('live-vibratii').style.color =
+                vibratii > 1.8 ? 'var(--warning)' : 'var(--text-main)';
+
+            if (temperatura > 72.0)
+                addAlert(`Supraîncălzire detectată la motor: ${temperatura}°C`, 'danger');
+            if (vibratii > 1.8)
+                addAlert(`Vibrații RMS peste pragul critic: ${vibratii}g`, 'warning');
+        } else {
+            // Motor oprit — resetează culorile senzorilor
+            document.getElementById('live-temperatura').style.color = 'var(--text-muted)';
+            document.getElementById('live-vibratii').style.color    = 'var(--text-muted)';
+        }
+
+        // Alertă baterie descărcată (indiferent de starea motorului)
+        if (vNum < 12.0)
+            addAlert(`Tensiune baterie scăzută: ${tensiune}V`, 'danger');
+
+        // Grafice — temperatură și vibrații doar când motorul e pornit
+        if (motorPornit) {
+            [temperaturaChart, vibratiiChart].forEach((chart, i) => {
+                const val = i === 0 ? temperatura : vibratii;
+                chart.data.labels.push(timeLabel);
+                chart.data.datasets[0].data.push(val);
+                if (chart.data.labels.length > 12) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+                chart.update('none');
+            });
+        }
+
+        // Grafic tensiune — mereu activ
+        tensiuneChart.data.labels.push(timeLabel);
+        tensiuneChart.data.datasets[0].data.push(tensiune);
+        if (tensiuneChart.data.labels.length > 12) {
+            tensiuneChart.data.labels.shift();
+            tensiuneChart.data.datasets[0].data.shift();
+        }
+        tensiuneChart.update('none');
     });
 </script>
 </body>
