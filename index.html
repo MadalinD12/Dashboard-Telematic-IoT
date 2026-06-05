@@ -363,11 +363,11 @@
                 addAlert(`Vibrații ridicate (medie 10 citiri): ${mediaVibratii.toFixed(2)}g`, 'warning', timeLabel);
         }
 
-        if (tensiune < PRAG_BATERIE_DESCARCATA && poateAlerta('baterie_descarcata'))
+        if (tensiune < PRAG_BATERIE_DESCARCATA)
             addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
-        else if (tensiune > PRAG_SUPRATENSIUNE && poateAlerta('supratensiune', 5))
+        else if (tensiune > PRAG_SUPRATENSIUNE)
             addAlert(`Supratensiune — regulator defect: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
-        else if (tensiune > PRAG_TENSIUNE_RIDICATA && poateAlerta('tensiune_ridicata', 5))
+        else if (tensiune > PRAG_TENSIUNE_RIDICATA)
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
 
         // Grafice live
