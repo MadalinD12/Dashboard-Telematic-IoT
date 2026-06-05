@@ -135,7 +135,7 @@
 </div>
 
 <script type="module">
-    import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     lucide.createIcons();
@@ -153,18 +153,17 @@
 
     // ── Stare internă browser ────────────────────────────────
     const istoricVibratii = [];
-    let   oraStartESP     = null;   // calculată la primul pachet live
-    let   indexAlerta     = 0;      // index circular alerte Firebase
+    let   indexAlerta     = 0;
 
-    // ── Conversie timestamp Arduino ("88s") → oră reală ──────
-    function convertTimestamp(timpStr) {
-        if (!oraStartESP) return timpStr;
-        const sec = parseInt(timpStr);
-        if (isNaN(sec)) return timpStr;
-        const oraReala = new Date(oraStartESP.getTime() + sec * 1000);
-        return oraReala.toLocaleTimeString([], {
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-        });
+    // ── Anti-spam alerte (nu repeta aceeasi alerta in 60s) ───
+    const ultimaAlerta = {};
+    function poateAlerta(cheie, intervalSecunde = 60) {
+        const acum = Date.now();
+        if (ultimaAlerta[cheie] && acum - ultimaAlerta[cheie] < intervalSecunde * 1000) {
+            return false;
+        }
+        ultimaAlerta[cheie] = acum;
+        return true;
     }
 
     // ── Grafice ──────────────────────────────────────────────
@@ -205,7 +204,7 @@
     }
 
     // ── Alerte ───────────────────────────────────────────────
-    function addAlert(message, type, timestamp, salveazaFirebase = true) {
+    function addAlert(message, type, timestamp, salveaza = true) {
         const container = document.getElementById('alert-container');
         const time = timestamp || new Date().toLocaleTimeString();
         const alertItem = document.createElement('div');
@@ -217,19 +216,13 @@
         container.insertBefore(alertItem, container.firstChild);
         if (container.children.length > MAX_ALERTE) container.removeChild(container.lastChild);
 
-        // Salvează în Firebase
-        if (salveazaFirebase) {
-            salveazaAlertaFirebase(message, type, time);
-        }
-    }
-
-    function salveazaAlertaFirebase(message, type, time) {
-        try {
-            const alertaObj = { mesaj: message, tip: type, timp: time };
-            set(ref(db, `senzori/alerte/${indexAlerta}`), alertaObj);
-            indexAlerta = (indexAlerta + 1) % MAX_ALERTE;
-        } catch (e) {
-            console.warn("[Alerte] Eroare la salvare:", e);
+        if (salveaza) {
+            try {
+                set(ref(db, `senzori/alerte/${indexAlerta}`), { mesaj: message, tip: type, timp: time });
+                indexAlerta = (indexAlerta + 1) % MAX_ALERTE;
+            } catch (e) {
+                console.warn("[Alerte] Eroare la salvare:", e);
+            }
         }
     }
 
@@ -268,85 +261,64 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    // ── Încarcă istoricul grafice la deschidere ───────────────
+    // ── Încarcă istoricul grafice ─────────────────────────────
     async function incarcaIstoric() {
         try {
             const snapshot = await get(ref(db, "senzori/istoric"));
             if (!snapshot.exists()) return;
-
             const istoric = snapshot.val();
             const intrari = Object.keys(istoric)
                 .map(k => ({ index: parseInt(k), data: istoric[k] }))
                 .sort((a, b) => a.index - b.index);
-
             intrari.forEach(({ data }) => {
-                const label = convertTimestamp(data.timp || "–");
+                const label = data.timp || "–";
                 adaugaPunctGrafic(temperaturaChart, label, parseFloat(data.temperatura || 0).toFixed(1));
                 adaugaPunctGrafic(vibratiiChart,    label, parseFloat(data.vibratii    || 0).toFixed(2));
                 adaugaPunctGrafic(tensiuneChart,    label, parseFloat(data.tensiune    || 0).toFixed(2));
             });
         } catch (e) {
-            console.warn("[Istoric] Eroare la încărcare:", e);
+            console.warn("[Istoric] Eroare:", e);
         }
     }
 
-    // ── Încarcă alertele salvate la deschidere ────────────────
+    // ── Încarcă alertele salvate ──────────────────────────────
     async function incarcaAlerte() {
         try {
             const snapshot = await get(ref(db, "senzori/alerte"));
             if (!snapshot.exists()) return;
-
             const alerte = snapshot.val();
-
-            // Găsește indexul curent (cel mai recent)
             const intrari = Object.keys(alerte)
                 .map(k => ({ index: parseInt(k), data: alerte[k] }))
                 .filter(({ data }) => data && data.mesaj)
                 .sort((a, b) => a.index - b.index);
-
             if (intrari.length > 0) {
-                // Setează indexAlerta la următorul index disponibil
                 indexAlerta = (intrari[intrari.length - 1].index + 1) % MAX_ALERTE;
             }
-
-            // Afișează alertele în ordine cronologică (cele mai vechi primele)
+            // Afișează fără a resalva în Firebase
             intrari.forEach(({ data }) => {
-                addAlert(data.mesaj, data.tip, data.timp, false); // false = nu resalva in Firebase
+                addAlert(data.mesaj, data.tip, data.timp, false);
             });
-
         } catch (e) {
-            console.warn("[Alerte] Eroare la încărcare:", e);
+            console.warn("[Alerte] Eroare:", e);
         }
     }
 
-    // Încarcă datele salvate la deschiderea paginii
-    // (istoricul se încarcă după primul pachet live pentru conversia timestamp)
+    incarcaIstoric();
     incarcaAlerte();
 
     // ── Ascultă datele live ──────────────────────────────────
-    let primaData = true;
-
-    onValue(ref(db, "senzori/live"), async (snapshot) => {
+    onValue(ref(db, "senzori/live"), (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
         const temperatura = parseFloat(data.temperatura || 0);
         const vibratii    = parseFloat(data.vibratii    || 0);
         const tensiune    = parseFloat(data.tensiune    || 0);
-        const timpArduino = parseInt(data.timp) || 0; // "88s" → 88
 
-        const timeLabel = new Date().toLocaleTimeString([], {
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-        });
-
-        // La primul pachet live: calculează ora de start ESP32
-        // și încarcă istoricul cu conversie corectă
-        if (primaData) {
-            primaData = false;
-            oraStartESP = new Date(Date.now() - timpArduino * 1000);
-            console.log(`[Timestamp] Ora start ESP32: ${oraStartESP.toLocaleTimeString()}`);
-            await incarcaIstoric(); // acum are oraStartESP pentru conversie
-        }
+        // Timestamp NTP de la Arduino (ex: "20:04:22") sau ora browser
+        const timeLabel = data.timp && data.timp.includes(':')
+            ? data.timp
+            : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
         // Medie vibrații
         istoricVibratii.push(vibratii);
@@ -378,24 +350,24 @@
 
         actualizeazaMotor(motorPornit);
 
-        // Alerte (salvate automat în Firebase)
+        // Alerte cu anti-spam 60 secunde
         if (motorPornit) {
-            if (temperatura >= PRAG_TEMP_CRITIC)
+            if (temperatura >= PRAG_TEMP_CRITIC && poateAlerta('temp_critic'))
                 addAlert(`Supraîncălzire critică motor: ${temperatura.toFixed(1)}°C`, 'danger', timeLabel);
-            else if (temperatura >= PRAG_TEMP_AVERTIZARE)
+            else if (temperatura >= PRAG_TEMP_AVERTIZARE && poateAlerta('temp_avertizare'))
                 addAlert(`Temperatură ridicată motor: ${temperatura.toFixed(1)}°C`, 'warning', timeLabel);
 
-            if (mediaVibratii >= PRAG_VIB_CRITIC)
+            if (mediaVibratii >= PRAG_VIB_CRITIC && poateAlerta('vib_critic'))
                 addAlert(`Vibrații critice (medie 10 citiri): ${mediaVibratii.toFixed(2)}g`, 'danger', timeLabel);
-            else if (mediaVibratii >= PRAG_VIB_AVERTIZARE)
+            else if (mediaVibratii >= PRAG_VIB_AVERTIZARE && poateAlerta('vib_avertizare'))
                 addAlert(`Vibrații ridicate (medie 10 citiri): ${mediaVibratii.toFixed(2)}g`, 'warning', timeLabel);
         }
 
-        if (tensiune < PRAG_BATERIE_DESCARCATA)
+        if (tensiune < PRAG_BATERIE_DESCARCATA && poateAlerta('baterie_descarcata'))
             addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
-        else if (tensiune > PRAG_SUPRATENSIUNE)
+        else if (tensiune > PRAG_SUPRATENSIUNE && poateAlerta('supratensiune'))
             addAlert(`Supratensiune — regulator defect: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
-        else if (tensiune > PRAG_TENSIUNE_RIDICATA)
+        else if (tensiune > PRAG_TENSIUNE_RIDICATA && poateAlerta('tensiune_ridicata'))
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
 
         // Grafice live
