@@ -115,12 +115,12 @@
             <div class="chart-card" id="chart-temp">
                 <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
                 <canvas id="temperaturaChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
             </div>
             <div class="chart-card" id="chart-vib">
                 <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (medie 10 citiri)</h3>
                 <canvas id="vibratiiChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
             </div>
             <div class="chart-card">
                 <h3><i data-lucide="zap"></i> Monitorizare Tensiune Baterie (Divizor tensiune)</h3>
@@ -140,7 +140,7 @@
 
     lucide.createIcons();
 
-    // ── Praguri ──────────────────────────────────────────────
+    //Setare Praguri
     const PRAG_MOTOR_PORNIT       = 13.8;
     const PRAG_TEMP_AVERTIZARE    = 80.0;
     const PRAG_TEMP_CRITIC        = 90.0;
@@ -151,13 +151,14 @@
     const PRAG_SUPRATENSIUNE      = 15.0;
     const MAX_ALERTE              = 10;
 
-    // ── Stare internă browser ────────────────────────────────
+    //Stare internă browser
     const istoricVibratii = [];
     let   indexAlerta     = 0;
 
-    // ── Anti-spam alerte (nu repeta aceeasi alerta in 60s) ───
+    //Anti-spam alerte (pentru a nu se repeta aceeasi alerta de mai multe ori)
     const ultimaAlerta = {};
-    function poateAlerta(cheie, intervalSecunde = 60) {
+    function poateAlerta(cheie, intervalSecunde = 60) //O potentiala alerta
+    {
         const acum = Date.now();
         if (ultimaAlerta[cheie] && acum - ultimaAlerta[cheie] < intervalSecunde * 1000) {
             return false;
@@ -166,7 +167,7 @@
         return true;
     }
 
-    // ── Grafice ──────────────────────────────────────────────
+    //Grafice
     const chartOptions = {
         responsive: true, maintainAspectRatio: false,
         scales: {
@@ -176,17 +177,19 @@
         plugins: { legend: { display: false } },
         elements: { line: { tension: 0.3 } }
     };
-
+    //Grafic pentru temperatura
     const temperaturaChart = new Chart(document.getElementById('temperaturaChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true }] },
         options: chartOptions
     });
+    //Grafic pentru vibrații
     const vibratiiChart = new Chart(document.getElementById('vibratiiChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true }] },
         options: chartOptions
     });
+    //Grafic pentru tensiune
     const tensiuneChart = new Chart(document.getElementById('tensiuneChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true }] },
@@ -203,7 +206,7 @@
         chart.update('none');
     }
 
-    // ── Alerte ───────────────────────────────────────────────
+    //Alerte pentru anomalii
     function addAlert(message, type, timestamp, salveaza = true) {
         const container = document.getElementById('alert-container');
         const time = timestamp || new Date().toLocaleTimeString();
@@ -226,7 +229,7 @@
         }
     }
 
-    // ── Motor badge ──────────────────────────────────────────
+    //Starea motorului
     function actualizeazaMotor(motorPornit) {
         const badge     = document.getElementById('motor-badge');
         const text      = document.getElementById('motor-text');
@@ -236,7 +239,7 @@
         if (motorPornit) {
             badge.className = 'motor-badge pornit';
             text.textContent = 'Motor pornit';
-            descTens.textContent = 'Nominal: 13.8–14.4V (motor pornit)';
+            descTens.textContent = 'Nominal: 13.8-14.4V (motor pornit)';
             chartTemp.classList.remove('motor-off');
             chartVib.classList.remove('motor-off');
         } else {
@@ -248,7 +251,7 @@
         }
     }
 
-    // ── Firebase ─────────────────────────────────────────────
+    //Conectarea cu baza de date Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
         authDomain: "panou-de-monitorizare.firebaseapp.com",
@@ -261,7 +264,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    // ── Încarcă alertele salvate ──────────────────────────────
+    //Incarca alertele salvate in Firebase
     async function incarcaAlerte() {
         try {
             const snapshot = await get(ref(db, "senzori/alerte"));
@@ -274,7 +277,7 @@
             if (intrari.length > 0) {
                 indexAlerta = (intrari[intrari.length - 1].index + 1) % MAX_ALERTE;
             }
-            // Afișează în ordine descrescătoare (cel mai recent primul)
+            //Afișează în ordine descrescătoare (cel mai recent primul)
             intrari.reverse().forEach(({ data }) => {
                 addAlert(data.mesaj, data.tip, data.timp, false);
             });
@@ -285,7 +288,7 @@
 
     incarcaAlerte();
 
-    // ── Ascultă datele live ──────────────────────────────────
+    //Citire date live din Firebase
     onValue(ref(db, "senzori/live"), (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
@@ -294,24 +297,23 @@
         const vibratii    = parseFloat(data.vibratii    || 0);
         const tensiune    = parseFloat(data.tensiune    || 0);
 
-        // Timestamp NTP de la Arduino (ex: "20:04:22") sau ora browser
-        const timeLabel = data.timp && data.timp.includes(':')
-            ? data.timp
-            : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-        // Medie vibrații
+        //Ora exacta pentru grafice
+        const timeLabel = new Date().toLocaleTimeString([], { 
+            hour: '2-digit', minute: '2-digit', second: '2-digit' 
+        });
+        //Medie pentru senzorul de vibrații
         istoricVibratii.push(vibratii);
         if (istoricVibratii.length > 10) istoricVibratii.shift();
         const mediaVibratii = istoricVibratii.reduce((a, b) => a + b, 0) / istoricVibratii.length;
 
         const motorPornit = tensiune >= PRAG_MOTOR_PORNIT;
 
-        // Actualizare carduri
+        //Actualizare carduri
         document.getElementById('live-temperatura').innerText = `${temperatura.toFixed(1)} °C`;
         document.getElementById('live-vibratii').innerText    = `${mediaVibratii.toFixed(2)} g`;
         document.getElementById('live-tensiune').innerText    = `${tensiune.toFixed(2)} V`;
 
-        // Culori carduri
+        //Culori carduri
         document.getElementById('live-temperatura').style.color =
             motorPornit && temperatura >= PRAG_TEMP_CRITIC     ? 'var(--danger)'  :
             motorPornit && temperatura >= PRAG_TEMP_AVERTIZARE ? 'var(--warning)' :
@@ -329,7 +331,7 @@
 
         actualizeazaMotor(motorPornit);
 
-        // Alerte cu anti-spam 60 secunde
+        //Alerte cu anti-spam 60 secunde
         if (motorPornit) {
             if (temperatura >= PRAG_TEMP_CRITIC && poateAlerta('temp_critic'))
                 addAlert(`Supraîncălzire critică motor: ${temperatura.toFixed(1)}°C`, 'danger', timeLabel);
@@ -349,7 +351,7 @@
         else if (tensiune > PRAG_TENSIUNE_RIDICATA && poateAlerta('tensiune_ridicata', 10))
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
 
-        // Grafice live
+        //Grafice live
         if (motorPornit) {
             adaugaPunctGrafic(temperaturaChart, timeLabel, temperatura.toFixed(1));
             adaugaPunctGrafic(vibratiiChart,    timeLabel, mediaVibratii.toFixed(2));
