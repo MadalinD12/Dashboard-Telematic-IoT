@@ -294,8 +294,8 @@
             if (intrari.length > 0) {
                 indexAlerta = (intrari[intrari.length - 1].index + 1) % MAX_ALERTE;
             }
-            // Afișează fără a resalva în Firebase
-            intrari.forEach(({ data }) => {
+            // Afișează în ordine descrescătoare (cel mai recent primul)
+            intrari.reverse().forEach(({ data }) => {
                 addAlert(data.mesaj, data.tip, data.timp, false);
             });
         } catch (e) {
@@ -363,11 +363,11 @@
                 addAlert(`Vibrații ridicate (medie 10 citiri): ${mediaVibratii.toFixed(2)}g`, 'warning', timeLabel);
         }
 
-        if (tensiune < PRAG_BATERIE_DESCARCATA)
+        if (tensiune < PRAG_BATERIE_DESCARCATA && poateAlerta('baterie_descarcata', 10))
             addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
-        else if (tensiune > PRAG_SUPRATENSIUNE)
+        else if (tensiune > PRAG_SUPRATENSIUNE && poateAlerta('supratensiune', 10))
             addAlert(`Supratensiune — regulator defect: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
-        else if (tensiune > PRAG_TENSIUNE_RIDICATA)
+        else if (tensiune > PRAG_TENSIUNE_RIDICATA && poateAlerta('tensiune_ridicata', 10))
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
 
         // Grafice live
