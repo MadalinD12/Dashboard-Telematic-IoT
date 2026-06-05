@@ -364,11 +364,11 @@
         }
 
         if (tensiune < PRAG_BATERIE_DESCARCATA && poateAlerta('baterie_descarcata'))
-            addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
+          addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
         else if (tensiune > PRAG_SUPRATENSIUNE && poateAlerta('supratensiune'))
-            addAlert(`Supratensiune — regulator defect: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
+          addAlert(`Supratensiune — regulator defect: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
         else if (tensiune > PRAG_TENSIUNE_RIDICATA && poateAlerta('tensiune_ridicata'))
-            addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
+          addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
 
         // Grafice live
         if (motorPornit) {
