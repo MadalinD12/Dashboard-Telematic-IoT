@@ -261,26 +261,6 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    // ── Încarcă istoricul grafice ─────────────────────────────
-    async function incarcaIstoric() {
-        try {
-            const snapshot = await get(ref(db, "senzori/istoric"));
-            if (!snapshot.exists()) return;
-            const istoric = snapshot.val();
-            const intrari = Object.keys(istoric)
-                .map(k => ({ index: parseInt(k), data: istoric[k] }))
-                .sort((a, b) => a.index - b.index);
-            intrari.forEach(({ data }) => {
-                const label = data.timp || "–";
-                adaugaPunctGrafic(temperaturaChart, label, parseFloat(data.temperatura || 0).toFixed(1));
-                adaugaPunctGrafic(vibratiiChart,    label, parseFloat(data.vibratii    || 0).toFixed(2));
-                adaugaPunctGrafic(tensiuneChart,    label, parseFloat(data.tensiune    || 0).toFixed(2));
-            });
-        } catch (e) {
-            console.warn("[Istoric] Eroare:", e);
-        }
-    }
-
     // ── Încarcă alertele salvate ──────────────────────────────
     async function incarcaAlerte() {
         try {
@@ -303,7 +283,6 @@
         }
     }
 
-    incarcaIstoric();
     incarcaAlerte();
 
     // ── Ascultă datele live ──────────────────────────────────
