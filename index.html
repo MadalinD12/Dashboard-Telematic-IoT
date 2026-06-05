@@ -8,17 +8,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #3b82f6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --border: #334155;
+            --bg-dark: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc;
+            --text-muted: #94a3b8; --primary: #3b82f6; --success: #10b981;
+            --warning: #f59e0b; --danger: #ef4444; --border: #334155;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); padding: 1.5rem; }
         .container { max-width: 1400px; margin: 0 auto; }
@@ -30,12 +23,12 @@
         .header-sub { color: var(--text-muted); font-size: clamp(0.7rem, 2.5vw, 0.875rem); margin-top: 0.2rem; }
         .header-badges { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 
-        .status-badge { display: flex; align-items: center; gap: 0.4rem; background: #1e293b; padding: 0.4rem 0.75rem; border-radius: 9999px; border: 1px solid var(--border); font-size: clamp(0.65rem, 2vw, 0.8rem); white-space: nowrap; flex-shrink: 0; }
+        .status-badge { display: flex; align-items: center; gap: 0.4rem; background: #1e293b; padding: 0.4rem 0.75rem; border-radius: 9999px; border: 1px solid var(--border); font-size: clamp(0.65rem, 2vw, 0.8rem); white-space: nowrap; }
         .status-dot { width: 7px; height: 7px; min-width: 7px; background-color: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
 
         .motor-badge { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; border-radius: 9999px; border: 1px solid var(--border); font-size: clamp(0.65rem, 2vw, 0.8rem); white-space: nowrap; font-weight: 600; transition: all 0.3s; }
-        .motor-badge.pornit  { background: rgba(16,185,129,0.15); border-color: var(--success); color: var(--success); }
-        .motor-badge.oprit   { background: rgba(148,163,184,0.1);  border-color: var(--border);  color: var(--text-muted); }
+        .motor-badge.pornit { background: rgba(16,185,129,0.15); border-color: var(--success); color: var(--success); }
+        .motor-badge.oprit  { background: rgba(148,163,184,0.1); border-color: var(--border); color: var(--text-muted); }
         .motor-dot { width: 7px; height: 7px; min-width: 7px; border-radius: 50%; }
         .motor-badge.pornit .motor-dot { background: var(--success); animation: pulse 2s infinite; }
         .motor-badge.oprit  .motor-dot { background: var(--text-muted); }
@@ -67,11 +60,7 @@
         .alert-info    { border-left-color: var(--primary); color: #93c5fd; }
         .alert-time    { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; }
 
-        @keyframes pulse {
-            0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
-            70%  { transform: scale(1);    box-shadow: 0 0 0 6px rgba(16,185,129,0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16,185,129,0); }
-        }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16,185,129,0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16,185,129,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } .alerts-panel { max-height: 360px; } .chart-card { height: 280px; } }
@@ -93,7 +82,6 @@
 </head>
 <body>
 <div class="container">
-
     <header>
         <div class="header-top">
             <div>
@@ -101,50 +89,24 @@
                 <p class="header-sub">Sistem de analiză predictivă pe arhitectură Edge-Cloud</p>
             </div>
             <div class="header-badges">
-                <div class="status-badge">
-                    <div class="status-dot"></div>
-                    <span>ESP32 Connected</span>
-                </div>
-                <div class="motor-badge oprit" id="motor-badge">
-                    <div class="motor-dot"></div>
-                    <span id="motor-text">Motor oprit</span>
-                </div>
+                <div class="status-badge"><div class="status-dot"></div><span>ESP32 Connected</span></div>
+                <div class="motor-badge oprit" id="motor-badge"><div class="motor-dot"></div><span id="motor-text">Motor oprit</span></div>
             </div>
         </div>
     </header>
 
     <div class="metrics-grid">
         <div class="card" style="border-top: 4px solid var(--primary);">
-            <div class="card-header">
-                <span class="card-title">Regim Termic Motor</span>
-                <i data-lucide="thermometer" class="card-icon" style="color: var(--primary);"></i>
-            </div>
-            <div class="card-body">
-                <div class="card-value" id="live-temperatura">-- °C</div>
-                <p class="card-desc">Avertizare: &gt; 80°C · Critic: &gt; 90°C</p>
-            </div>
+            <div class="card-header"><span class="card-title">Regim Termic Motor</span><i data-lucide="thermometer" class="card-icon" style="color: var(--primary);"></i></div>
+            <div class="card-body"><div class="card-value" id="live-temperatura">-- °C</div><p class="card-desc">Avertizare: &gt; 80°C · Critic: &gt; 90°C</p></div>
         </div>
-
         <div class="card" style="border-top: 4px solid var(--warning);">
-            <div class="card-header">
-                <span class="card-title">Nivel Vibrații (medie 10 citiri)</span>
-                <i data-lucide="activity" class="card-icon" style="color: var(--warning);"></i>
-            </div>
-            <div class="card-body">
-                <div class="card-value" id="live-vibratii">-- g</div>
-                <p class="card-desc">Avertizare: &gt; 4.0g · Critic: &gt; 6.0g</p>
-            </div>
+            <div class="card-header"><span class="card-title">Nivel Vibrații (medie 10 citiri)</span><i data-lucide="activity" class="card-icon" style="color: var(--warning);"></i></div>
+            <div class="card-body"><div class="card-value" id="live-vibratii">-- g</div><p class="card-desc">Avertizare: &gt; 4.0g · Critic: &gt; 6.0g</p></div>
         </div>
-
         <div class="card" style="border-top: 4px solid var(--success);">
-            <div class="card-header">
-                <span class="card-title">Tensiune Baterie</span>
-                <i data-lucide="zap" class="card-icon" style="color: var(--success);"></i>
-            </div>
-            <div class="card-body">
-                <div class="card-value" id="live-tensiune">-- V</div>
-                <p class="card-desc" id="tensiune-desc">Nominal: 12.6V (motor oprit)</p>
-            </div>
+            <div class="card-header"><span class="card-title">Tensiune Baterie</span><i data-lucide="zap" class="card-icon" style="color: var(--success);"></i></div>
+            <div class="card-body"><div class="card-value" id="live-tensiune">-- V</div><p class="card-desc" id="tensiune-desc">Nominal: 12.6V (motor oprit)</p></div>
         </div>
     </div>
 
@@ -153,53 +115,47 @@
             <div class="chart-card" id="chart-temp">
                 <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
                 <canvas id="temperaturaChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
             </div>
             <div class="chart-card" id="chart-vib">
                 <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (medie 10 citiri)</h3>
                 <canvas id="vibratiiChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
             </div>
             <div class="chart-card">
                 <h3><i data-lucide="zap"></i> Monitorizare Tensiune Baterie (Divizor tensiune)</h3>
                 <canvas id="tensiuneChart"></canvas>
             </div>
         </div>
-
         <div class="alerts-panel">
             <h2><i data-lucide="bell" style="color: var(--danger);"></i> Jurnal Alerte</h2>
             <div class="alert-list" id="alert-container"></div>
         </div>
     </div>
-
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     lucide.createIcons();
 
-    // ── Praguri sistem ───────────────────────────────────────
-    const PRAG_MOTOR_PORNIT         = 13.8;  // V peste asta = motor pornit
-
-    const PRAG_TEMP_AVERTIZARE      = 80.0;  // °C furtun răcire
-    const PRAG_TEMP_CRITIC          = 90.0;  // °C furtun răcire
-
-    const PRAG_VIB_AVERTIZARE       = 4.0;   // g medie 10 citiri
-    const PRAG_VIB_CRITIC           = 6.0;   // g medie 10 citiri
-
-    const PRAG_BATERIE_DESCARCATA   = 12.0;  // V
-    const PRAG_TENSIUNE_RIDICATA    = 14.4;  // V avertizare regulator
-    const PRAG_SUPRATENSIUNE        = 15.0;  // V pericol
+    // ── Praguri ──────────────────────────────────────────────
+    const PRAG_MOTOR_PORNIT       = 13.8;
+    const PRAG_TEMP_AVERTIZARE    = 80.0;
+    const PRAG_TEMP_CRITIC        = 90.0;
+    const PRAG_VIB_AVERTIZARE     = 4.0;
+    const PRAG_VIB_CRITIC         = 6.0;
+    const PRAG_BATERIE_DESCARCATA = 12.0;
+    const PRAG_TENSIUNE_RIDICATA  = 14.4;
+    const PRAG_SUPRATENSIUNE      = 15.0;
 
     // ── Istoric vibrații pentru medie ────────────────────────
     const istoricVibratii = [];
 
     // ── Grafice ──────────────────────────────────────────────
     const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         scales: {
             x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', maxRotation: 0, font: { size: 10 } } },
             y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
@@ -213,50 +169,53 @@
         data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true }] },
         options: chartOptions
     });
-
     const vibratiiChart = new Chart(document.getElementById('vibratiiChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true }] },
         options: chartOptions
     });
-
     const tensiuneChart = new Chart(document.getElementById('tensiuneChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true }] },
         options: chartOptions
     });
 
-    // ── Funcție adăugare alertă ──────────────────────────────
+    // ── Funcție adăugare punct în grafic ────────────────────
+    function adaugaPunctGrafic(chart, label, value, maxPuncte = 20) {
+        chart.data.labels.push(label);
+        chart.data.datasets[0].data.push(value);
+        if (chart.data.labels.length > maxPuncte) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+        }
+        chart.update('none');
+    }
+
     function addAlert(message, type) {
         const container = document.getElementById('alert-container');
         const time = new Date().toLocaleTimeString();
         const alertItem = document.createElement('div');
         alertItem.className = `alert-item alert-${type}`;
-        alertItem.innerHTML = `
-            <div><strong>${type === 'danger' ? 'CRITIC' : type === 'warning' ? 'AVERTIZARE' : 'INFO'}:</strong> ${message}</div>
-            <div class="alert-time">${time}</div>
-        `;
+        alertItem.innerHTML = `<div><strong>${type === 'danger' ? 'CRITIC' : type === 'warning' ? 'AVERTIZARE' : 'INFO'}:</strong> ${message}</div><div class="alert-time">${time}</div>`;
         container.insertBefore(alertItem, container.firstChild);
         if (container.children.length > 10) container.removeChild(container.lastChild);
     }
 
-    // ── Actualizare badge motor ──────────────────────────────
     function actualizeazaMotor(motorPornit) {
-        const badge     = document.getElementById('motor-badge');
-        const text      = document.getElementById('motor-text');
-        const descTens  = document.getElementById('tensiune-desc');
+        const badge    = document.getElementById('motor-badge');
+        const text     = document.getElementById('motor-text');
+        const descTens = document.getElementById('tensiune-desc');
         const chartTemp = document.getElementById('chart-temp');
         const chartVib  = document.getElementById('chart-vib');
-
         if (motorPornit) {
-            badge.className      = 'motor-badge pornit';
-            text.textContent     = 'Motor pornit';
+            badge.className = 'motor-badge pornit';
+            text.textContent = 'Motor pornit';
             descTens.textContent = 'Nominal: 13.8–14.4V (motor pornit)';
             chartTemp.classList.remove('motor-off');
             chartVib.classList.remove('motor-off');
         } else {
-            badge.className      = 'motor-badge oprit';
-            text.textContent     = 'Motor oprit';
+            badge.className = 'motor-badge oprit';
+            text.textContent = 'Motor oprit';
             descTens.textContent = 'Nominal: 12.6V (motor oprit)';
             chartTemp.classList.add('motor-off');
             chartVib.classList.add('motor-off');
@@ -277,7 +236,36 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    onValue(ref(db, "senzori"), (snapshot) => {
+    // ── Încarcă istoricul la deschiderea paginii ─────────────
+    async function incarcaIstoric() {
+        try {
+            const snapshot = await get(ref(db, "senzori/istoric"));
+            if (!snapshot.exists()) return;
+
+            const istoric = snapshot.val();
+            // Sortează după index (0-19)
+            const intrari = Object.keys(istoric)
+                .map(k => ({ index: parseInt(k), data: istoric[k] }))
+                .sort((a, b) => a.index - b.index);
+
+            intrari.forEach(({ data }) => {
+                const label = data.timp || "–";
+                adaugaPunctGrafic(temperaturaChart, label, parseFloat(data.temperatura || 0).toFixed(1));
+                adaugaPunctGrafic(vibratiiChart,    label, parseFloat(data.vibratii    || 0).toFixed(2));
+                adaugaPunctGrafic(tensiuneChart,    label, parseFloat(data.tensiune    || 0).toFixed(2));
+            });
+
+            console.log(`[Istoric] ${intrari.length} înregistrări încărcate.`);
+        } catch (e) {
+            console.warn("[Istoric] Eroare la încărcare:", e);
+        }
+    }
+
+    // Încarcă istoricul imediat la deschidere
+    incarcaIstoric();
+
+    // ── Ascultă datele live ──────────────────────────────────
+    onValue(ref(db, "senzori/live"), (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
@@ -289,83 +277,61 @@
         const vibratii    = parseFloat(data.vibratii    || 0);
         const tensiune    = parseFloat(data.tensiune    || 0);
 
-        // ── Medie vibrații (ultimele 10 citiri) ──
+        // Medie vibrații
         istoricVibratii.push(vibratii);
         if (istoricVibratii.length > 10) istoricVibratii.shift();
         const mediaVibratii = istoricVibratii.reduce((a, b) => a + b, 0) / istoricVibratii.length;
 
-        // ── Detectare stare motor ──
         const motorPornit = tensiune >= PRAG_MOTOR_PORNIT;
 
-        // ── Actualizare carduri ──
+        // Actualizare carduri
         document.getElementById('live-temperatura').innerText = `${temperatura.toFixed(1)} °C`;
         document.getElementById('live-vibratii').innerText    = `${mediaVibratii.toFixed(2)} g`;
         document.getElementById('live-tensiune').innerText    = `${tensiune.toFixed(2)} V`;
 
-        // ── Culori card temperatură ──
+        // Culori carduri
         document.getElementById('live-temperatura').style.color =
-            motorPornit && temperatura >= PRAG_TEMP_CRITIC   ? 'var(--danger)'  :
-            motorPornit && temperatura >= PRAG_TEMP_AVERTIZARE ? 'var(--warning)' :
+            motorPornit && temperatura >= PRAG_TEMP_CRITIC      ? 'var(--danger)'  :
+            motorPornit && temperatura >= PRAG_TEMP_AVERTIZARE  ? 'var(--warning)' :
             motorPornit ? 'var(--text-main)' : 'var(--text-muted)';
 
-        // ── Culori card vibrații ──
         document.getElementById('live-vibratii').style.color =
-            motorPornit && mediaVibratii >= PRAG_VIB_CRITIC      ? 'var(--danger)'  :
-            motorPornit && mediaVibratii >= PRAG_VIB_AVERTIZARE  ? 'var(--warning)' :
+            motorPornit && mediaVibratii >= PRAG_VIB_CRITIC     ? 'var(--danger)'  :
+            motorPornit && mediaVibratii >= PRAG_VIB_AVERTIZARE ? 'var(--warning)' :
             motorPornit ? 'var(--text-main)' : 'var(--text-muted)';
 
-        // ── Culori card tensiune ──
         document.getElementById('live-tensiune').style.color =
             tensiune < PRAG_BATERIE_DESCARCATA ? 'var(--danger)'  :
             tensiune > PRAG_SUPRATENSIUNE      ? 'var(--danger)'  :
             tensiune > PRAG_TENSIUNE_RIDICATA  ? 'var(--warning)' : 'var(--text-main)';
 
-        // ── Badge motor ──
         actualizeazaMotor(motorPornit);
 
-        // ── Alerte temperatură și vibrații (doar motor pornit) ──
+        // Alerte
         if (motorPornit) {
             if (temperatura >= PRAG_TEMP_CRITIC)
                 addAlert(`Supraîncălzire critică motor: ${temperatura.toFixed(1)}°C`, 'danger');
             else if (temperatura >= PRAG_TEMP_AVERTIZARE)
                 addAlert(`Temperatură ridicată motor: ${temperatura.toFixed(1)}°C`, 'warning');
-
             if (mediaVibratii >= PRAG_VIB_CRITIC)
                 addAlert(`Vibrații critice (medie 10 citiri): ${mediaVibratii.toFixed(2)}g`, 'danger');
             else if (mediaVibratii >= PRAG_VIB_AVERTIZARE)
                 addAlert(`Vibrații ridicate (medie 10 citiri): ${mediaVibratii.toFixed(2)}g`, 'warning');
         }
 
-        // ── Alerte tensiune (mereu active) ──
         if (tensiune < PRAG_BATERIE_DESCARCATA)
             addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger');
         else if (tensiune > PRAG_SUPRATENSIUNE)
-            addAlert(`Supratensiune, regulator defect: ${tensiune.toFixed(2)}V`, 'danger');
+            addAlert(`Supratensiune — regulator defect: ${tensiune.toFixed(2)}V`, 'danger');
         else if (tensiune > PRAG_TENSIUNE_RIDICATA)
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning');
 
-        // ── Grafice temperatură și vibrații (doar motor pornit) ──
+        // Grafice live
         if (motorPornit) {
-            [temperaturaChart, vibratiiChart].forEach((chart, i) => {
-                const val = i === 0 ? temperatura.toFixed(1) : mediaVibratii.toFixed(2);
-                chart.data.labels.push(timeLabel);
-                chart.data.datasets[0].data.push(val);
-                if (chart.data.labels.length > 12) {
-                    chart.data.labels.shift();
-                    chart.data.datasets[0].data.shift();
-                }
-                chart.update('none');
-            });
+            adaugaPunctGrafic(temperaturaChart, timeLabel, temperatura.toFixed(1));
+            adaugaPunctGrafic(vibratiiChart,    timeLabel, mediaVibratii.toFixed(2));
         }
-
-        // ── Grafic tensiune (mereu activ) ──
-        tensiuneChart.data.labels.push(timeLabel);
-        tensiuneChart.data.datasets[0].data.push(tensiune.toFixed(2));
-        if (tensiuneChart.data.labels.length > 12) {
-            tensiuneChart.data.labels.shift();
-            tensiuneChart.data.datasets[0].data.shift();
-        }
-        tensiuneChart.update('none');
+        adaugaPunctGrafic(tensiuneChart, timeLabel, tensiune.toFixed(2));
     });
 </script>
 </body>
