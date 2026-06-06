@@ -119,21 +119,21 @@
             <div class="chart-card" id="chart-temp">
                 <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
                 <canvas id="temperaturaChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit - date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
             </div>
             <div class="chart-card" id="chart-vib">
                 <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (medie 10 citiri)</h3>
                 <canvas id="vibratiiChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit - date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
             </div>
             <div class="chart-card">
                 <h3><i data-lucide="zap"></i> Monitorizare Tensiune Baterie (Divizor tensiune)</h3>
                 <canvas id="tensiuneChart"></canvas>
             </div>
             <div class="chart-card" id="chart-engineload">
-                <h3><i data-lucide="gauge"></i> Sarcină Motor: Engine Load (OBD-II)</h3>
+                <h3><i data-lucide="gauge"></i> Sarcină Motor — Engine Load (OBD-II)</h3>
                 <canvas id="engineloadChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit - date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit — date în așteptare</div>
             </div>
         </div>
         <div class="alerts-panel">
@@ -201,6 +201,19 @@
         data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true }] },
         options: chartOptions
     });
+    //Grafic pentru Engine Load cu axa Y fixă 0-100%
+    const engineloadOptions = {
+        ...chartOptions,
+        scales: {
+            ...chartOptions.scales,
+            y: { ...chartOptions.scales.y, min: 0, max: 100 }
+        }
+    };
+    const engineloadChart = new Chart(document.getElementById('engineloadChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [{ data: [], borderColor: '#a855f7', backgroundColor: 'rgba(168,85,247,0.1)', fill: true }] },
+        options: engineloadOptions
+    });
 
     function adaugaPunctGrafic(chart, label, value, maxPuncte = 20) {
         chart.data.labels.push(label);
@@ -240,20 +253,23 @@
         const badge     = document.getElementById('motor-badge');
         const text      = document.getElementById('motor-text');
         const descTens  = document.getElementById('tensiune-desc');
-        const chartTemp = document.getElementById('chart-temp');
-        const chartVib  = document.getElementById('chart-vib');
+        const chartTemp       = document.getElementById('chart-temp');
+        const chartVib        = document.getElementById('chart-vib');
+        const chartEngineLoad = document.getElementById('chart-engineload');
         if (motorPornit) {
             badge.className = 'motor-badge pornit';
             text.textContent = 'Motor pornit';
             descTens.textContent = 'Nominal: 13.8–14.4V (motor pornit)';
             chartTemp.classList.remove('motor-off');
             chartVib.classList.remove('motor-off');
+            chartEngineLoad.classList.remove('motor-off');
         } else {
             badge.className = 'motor-badge oprit';
             text.textContent = 'Motor oprit';
             descTens.textContent = 'Nominal: 12.6V (motor oprit)';
             chartTemp.classList.add('motor-off');
             chartVib.classList.add('motor-off');
+            chartEngineLoad.classList.add('motor-off');
         }
     }
 
