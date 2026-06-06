@@ -33,7 +33,7 @@
         .motor-badge.pornit .motor-dot { background: var(--success); animation: pulse 2s infinite; }
         .motor-badge.oprit  .motor-dot { background: var(--text-muted); }
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
         .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; min-width: 0; }
         .card:hover { transform: translateY(-2px); }
         .card-header { display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); margin-bottom: 0.6rem; gap: 0.5rem; }
@@ -67,7 +67,7 @@
         @media (max-width: 600px) {
             body { padding: 0.85rem; }
             .header-top { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
-            .metrics-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+            .metrics-grid { grid-template-columns: 1fr; gap: 0.75rem; } /* 1 coloana pe mobil */
             .card { padding: 1rem 1.1rem; flex-direction: row; align-items: center; gap: 1rem; }
             .card-header { margin-bottom: 0; flex-direction: column; align-items: flex-start; gap: 0.2rem; }
             .card-body { margin-left: auto; text-align: right; }
@@ -108,6 +108,10 @@
             <div class="card-header"><span class="card-title">Tensiune Baterie</span><i data-lucide="zap" class="card-icon" style="color: var(--success);"></i></div>
             <div class="card-body"><div class="card-value" id="live-tensiune">-- V</div><p class="card-desc" id="tensiune-desc">Nominal: 12.6V (motor oprit)</p></div>
         </div>
+        <div class="card" style="border-top: 4px solid #a855f7;">
+            <div class="card-header"><span class="card-title">Sarcină Motor (Engine Load)</span><i data-lucide="gauge" class="card-icon" style="color: #a855f7;"></i></div>
+            <div class="card-body"><div class="card-value" id="live-engineload">-- %</div><p class="card-desc">Avertizare: &gt; 80% · Critic: &gt; 95%</p></div>
+        </div>
     </div>
 
     <div class="main-layout">
@@ -115,16 +119,21 @@
             <div class="chart-card" id="chart-temp">
                 <h3><i data-lucide="thermometer"></i> Istoric temperatură Cămașă Motor</h3>
                 <canvas id="temperaturaChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit - date în așteptare</div>
             </div>
             <div class="chart-card" id="chart-vib">
                 <h3><i data-lucide="activity"></i> Profil Amplitudine Vibrații (medie 10 citiri)</h3>
                 <canvas id="vibratiiChart"></canvas>
-                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit: date în așteptare</div>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit - date în așteptare</div>
             </div>
             <div class="chart-card">
                 <h3><i data-lucide="zap"></i> Monitorizare Tensiune Baterie (Divizor tensiune)</h3>
                 <canvas id="tensiuneChart"></canvas>
+            </div>
+            <div class="chart-card" id="chart-engineload">
+                <h3><i data-lucide="gauge"></i> Sarcină Motor: Engine Load (OBD-II)</h3>
+                <canvas id="engineloadChart"></canvas>
+                <div class="chart-overlay"><i data-lucide="moon"></i> Motor oprit - date în așteptare</div>
             </div>
         </div>
         <div class="alerts-panel">
@@ -140,7 +149,7 @@
 
     lucide.createIcons();
 
-    //Setare Praguri
+    // ── Praguri ──────────────────────────────────────────────
     const PRAG_MOTOR_PORNIT       = 13.8;
     const PRAG_TEMP_AVERTIZARE    = 80.0;
     const PRAG_TEMP_CRITIC        = 90.0;
@@ -151,14 +160,13 @@
     const PRAG_SUPRATENSIUNE      = 15.0;
     const MAX_ALERTE              = 10;
 
-    //Stare internă browser
+    // ── Stare internă browser ────────────────────────────────
     const istoricVibratii = [];
     let   indexAlerta     = 0;
 
-    //Anti-spam alerte (pentru a nu se repeta aceeasi alerta de mai multe ori)
+    // ── Anti-spam alerte (nu repeta aceeasi alerta in 60s) ───
     const ultimaAlerta = {};
-    function poateAlerta(cheie, intervalSecunde = 60) //O potentiala alerta
-    {
+    function poateAlerta(cheie, intervalSecunde = 60) {
         const acum = Date.now();
         if (ultimaAlerta[cheie] && acum - ultimaAlerta[cheie] < intervalSecunde * 1000) {
             return false;
@@ -167,7 +175,7 @@
         return true;
     }
 
-    //Grafice
+    // ── Grafice ──────────────────────────────────────────────
     const chartOptions = {
         responsive: true, maintainAspectRatio: false,
         scales: {
@@ -177,19 +185,17 @@
         plugins: { legend: { display: false } },
         elements: { line: { tension: 0.3 } }
     };
-    //Grafic pentru temperatura
+
     const temperaturaChart = new Chart(document.getElementById('temperaturaChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true }] },
         options: chartOptions
     });
-    //Grafic pentru vibrații
     const vibratiiChart = new Chart(document.getElementById('vibratiiChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true }] },
         options: chartOptions
     });
-    //Grafic pentru tensiune
     const tensiuneChart = new Chart(document.getElementById('tensiuneChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true }] },
@@ -206,7 +212,7 @@
         chart.update('none');
     }
 
-    //Alerte pentru anomalii
+    // ── Alerte ───────────────────────────────────────────────
     function addAlert(message, type, timestamp, salveaza = true) {
         const container = document.getElementById('alert-container');
         const time = timestamp || new Date().toLocaleTimeString();
@@ -229,7 +235,7 @@
         }
     }
 
-    //Starea motorului
+    // ── Motor badge ──────────────────────────────────────────
     function actualizeazaMotor(motorPornit) {
         const badge     = document.getElementById('motor-badge');
         const text      = document.getElementById('motor-text');
@@ -239,7 +245,7 @@
         if (motorPornit) {
             badge.className = 'motor-badge pornit';
             text.textContent = 'Motor pornit';
-            descTens.textContent = 'Nominal: 13.8-14.4V (motor pornit)';
+            descTens.textContent = 'Nominal: 13.8–14.4V (motor pornit)';
             chartTemp.classList.remove('motor-off');
             chartVib.classList.remove('motor-off');
         } else {
@@ -251,7 +257,7 @@
         }
     }
 
-    //Conectarea cu baza de date Firebase
+    // ── Firebase ─────────────────────────────────────────────
     const firebaseConfig = {
         apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
         authDomain: "panou-de-monitorizare.firebaseapp.com",
@@ -264,7 +270,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    //Incarca alertele salvate in Firebase
+    // ── Încarcă alertele salvate ──────────────────────────────
     async function incarcaAlerte() {
         try {
             const snapshot = await get(ref(db, "senzori/alerte"));
@@ -277,7 +283,7 @@
             if (intrari.length > 0) {
                 indexAlerta = (intrari[intrari.length - 1].index + 1) % MAX_ALERTE;
             }
-            //Afișează în ordine descrescătoare (cel mai recent primul)
+            // Afișează în ordine descrescătoare (cel mai recent primul)
             intrari.reverse().forEach(({ data }) => {
                 addAlert(data.mesaj, data.tip, data.timp, false);
             });
@@ -288,32 +294,36 @@
 
     incarcaAlerte();
 
-    //Citire date live din Firebase
+    // ── Ascultă datele live ──────────────────────────────────
     onValue(ref(db, "senzori/live"), (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
-        const temperatura = parseFloat(data.temperatura || 0);
-        const vibratii    = parseFloat(data.vibratii    || 0);
-        const tensiune    = parseFloat(data.tensiune    || 0);
+        const temperatura  = parseFloat(data.temperatura  || 0);
+        const vibratii     = parseFloat(data.vibratii     || 0);
+        const tensiune     = parseFloat(data.tensiune     || 0);
+        const engineLoad   = parseFloat(data.engineload   || ultimaEngineLoad);
+        ultimaEngineLoad   = engineLoad;
 
-        //Ora exacta pentru grafice
-        const timeLabel = new Date().toLocaleTimeString([], { 
-            hour: '2-digit', minute: '2-digit', second: '2-digit' 
-        });
-        //Medie pentru senzorul de vibrații
+        // Timestamp NTP de la Arduino (ex: "20:04:22") sau ora browser
+        const timeLabel = data.timp && data.timp.includes(':')
+            ? data.timp
+            : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        // Medie vibrații
         istoricVibratii.push(vibratii);
         if (istoricVibratii.length > 10) istoricVibratii.shift();
         const mediaVibratii = istoricVibratii.reduce((a, b) => a + b, 0) / istoricVibratii.length;
 
         const motorPornit = tensiune >= PRAG_MOTOR_PORNIT;
 
-        //Actualizare carduri
+        // Actualizare carduri
         document.getElementById('live-temperatura').innerText = `${temperatura.toFixed(1)} °C`;
         document.getElementById('live-vibratii').innerText    = `${mediaVibratii.toFixed(2)} g`;
         document.getElementById('live-tensiune').innerText    = `${tensiune.toFixed(2)} V`;
+        document.getElementById('live-engineload').innerText  = motorPornit ? `${engineLoad.toFixed(1)} %` : `-- %`;
 
-        //Culori carduri
+        // Culori carduri
         document.getElementById('live-temperatura').style.color =
             motorPornit && temperatura >= PRAG_TEMP_CRITIC     ? 'var(--danger)'  :
             motorPornit && temperatura >= PRAG_TEMP_AVERTIZARE ? 'var(--warning)' :
@@ -324,6 +334,11 @@
             motorPornit && mediaVibratii >= PRAG_VIB_AVERTIZARE ? 'var(--warning)' :
             motorPornit ? 'var(--text-main)' : 'var(--text-muted)';
 
+        document.getElementById('live-engineload').style.color =
+            motorPornit && engineLoad >= PRAG_ENGINE_LOAD_CRITIC      ? 'var(--danger)'  :
+            motorPornit && engineLoad >= PRAG_ENGINE_LOAD_AVERTIZARE  ? 'var(--warning)' :
+            motorPornit ? 'var(--text-main)' : 'var(--text-muted)';
+
         document.getElementById('live-tensiune').style.color =
             tensiune < PRAG_BATERIE_DESCARCATA ? 'var(--danger)'  :
             tensiune > PRAG_SUPRATENSIUNE      ? 'var(--danger)'  :
@@ -331,7 +346,7 @@
 
         actualizeazaMotor(motorPornit);
 
-        //Alerte cu anti-spam 60 secunde
+        // Alerte cu anti-spam 60 secunde
         if (motorPornit) {
             if (temperatura >= PRAG_TEMP_CRITIC && poateAlerta('temp_critic'))
                 addAlert(`Supraîncălzire critică motor: ${temperatura.toFixed(1)}°C`, 'danger', timeLabel);
@@ -351,7 +366,7 @@
         else if (tensiune > PRAG_TENSIUNE_RIDICATA && poateAlerta('tensiune_ridicata', 10))
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
 
-        //Grafice live
+        // Grafice live
         if (motorPornit) {
             adaugaPunctGrafic(temperaturaChart, timeLabel, temperatura.toFixed(1));
             adaugaPunctGrafic(vibratiiChart,    timeLabel, mediaVibratii.toFixed(2));
