@@ -157,7 +157,7 @@
 
     lucide.createIcons();
 
-    // ── Praguri ──────────────────────────────────────────────
+    //Pragurile de alertare și critic pentru fiecare parametru, plus anti-spam pentru alerte
     const PRAG_MOTOR_PORNIT           = 13.8;
     const PRAG_TEMP_AVERTIZARE        = 85.0;
     const PRAG_TEMP_CRITIC            = 95.0;
@@ -174,13 +174,13 @@
     const PRAG_RPM_RIDICAT            = 4500;
     const MAX_ALERTE                  = 10;
 
-    // ── Stare internă ────────────────────────────────────────
+    //Stare internă pentru medie vibrații și index alerte circulare în Firebase
     const istoricVibratii = [];
     let   indexAlerta     = 0;
     let   ultimaEngineLoad = 0;
     let   ultimaRPM        = 0;
 
-    // ── Anti-spam ────────────────────────────────────────────
+    //Anti-spam alerte
     const ultimaAlerta = {};
     function poateAlerta(cheie, sec = 60) {
         const acum = Date.now();
@@ -189,7 +189,7 @@
         return true;
     }
 
-    // ── Opțiuni comune grafice ───────────────────────────────
+    //Opțiuni comune grafice (pt a ascunde grid pe x, fonturi si culori adaptate pentru dark mode, fara legenda si cu linii usor curbate)
     const chartOptions = {
         responsive: true, maintainAspectRatio: false,
         scales: {
@@ -200,7 +200,7 @@
         elements: { line: { tension: 0.3 } }
     };
 
-    // ── Grafice ──────────────────────────────────────────────
+    //Graficele
     const temperaturaChart = new Chart(document.getElementById('temperaturaChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true }] },
@@ -236,7 +236,7 @@
         chart.update('none');
     }
 
-    // ── Alerte ───────────────────────────────────────────────
+    //Alertele
     function addAlert(msg, type, time, salveaza = true) {
         const container = document.getElementById('alert-container');
         const t = time || new Date().toLocaleTimeString();
@@ -253,7 +253,7 @@
         }
     }
 
-    // ── Motor badge + overlay ────────────────────────────────
+    //Motor badge + overlay
     function actualizeazaMotor(pornit) {
         const badge = document.getElementById('motor-badge');
         const text  = document.getElementById('motor-text');
@@ -272,7 +272,7 @@
         }
     }
 
-    // ── Firebase ─────────────────────────────────────────────
+    //Configurare Firebase 
     const firebaseConfig = {
         apiKey: "AIzaSyA6xDs1iDFFc6cGLhYHQ11rU5bNUg27Yjg",
         authDomain: "panou-de-monitorizare.firebaseapp.com",
@@ -285,7 +285,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    // ── Încarcă alerte salvate ───────────────────────────────
+    //Incarca alerte salvate în Firebase la initializare
     async function incarcaAlerte() {
         try {
             const snap = await get(ref(db, "senzori/alerte"));
@@ -301,7 +301,7 @@
     }
     incarcaAlerte();
 
-    // ── Citire date live ─────────────────────────────────────
+    //Citire date live din Firebase
     onValue(ref(db, "senzori/live"), (snap) => {
         const data = snap.val();
         if (!data) return;
@@ -324,14 +324,14 @@
 
         const motorPornit = tensiune >= PRAG_MOTOR_PORNIT;
 
-        // ── Actualizare carduri ──────────────────────────────
+        //Actualizare carduri 
         document.getElementById('live-temperatura').innerText  = `${temperatura.toFixed(1)} °C`;
         document.getElementById('live-vibratii').innerText     = `${mediaVib.toFixed(2)} g`;
         document.getElementById('live-tensiune').innerText     = `${tensiune.toFixed(2)} V`;
         document.getElementById('live-engineload').innerText   = motorPornit ? `${engineLoad.toFixed(1)} %` : `-- %`;
         document.getElementById('live-rpm').innerText          = motorPornit ? `${Math.round(rpm)} rpm` : `-- rpm`;
 
-        // ── Culori carduri ───────────────────────────────────
+        //Culori carduri
         document.getElementById('live-temperatura').style.color =
             motorPornit && temperatura >= PRAG_TEMP_CRITIC     ? 'var(--danger)'  :
             motorPornit && temperatura >= PRAG_TEMP_AVERTIZARE ? 'var(--warning)' :
@@ -358,25 +358,25 @@
 
         actualizeazaMotor(motorPornit);
 
-        // ── Alerte temperatură și vibrații ───────────────────
+       
         if (motorPornit) {
+            //Alerte temperatură
             if (temperatura >= PRAG_TEMP_CRITIC && poateAlerta('temp_critic'))
                 addAlert(`Supraîncălzire critică motor: ${temperatura.toFixed(1)}°C`, 'danger', timeLabel);
             else if (temperatura >= PRAG_TEMP_AVERTIZARE && poateAlerta('temp_avertizare'))
                 addAlert(`Temperatură ridicată motor: ${temperatura.toFixed(1)}°C`, 'warning', timeLabel);
-
+            //Alerte vibrații
             if (mediaVib >= PRAG_VIB_CRITIC && poateAlerta('vib_critic'))
                 addAlert(`Vibrații critice: ${mediaVib.toFixed(2)}g`, 'danger', timeLabel);
             else if (mediaVib >= PRAG_VIB_AVERTIZARE && poateAlerta('vib_avertizare'))
                 addAlert(`Vibrații ridicate: ${mediaVib.toFixed(2)}g`, 'warning', timeLabel);
-
-            // ── Alerte Engine Load ───────────────────────────
+            //Alerte pentru Engine Load
             if (engineLoad >= PRAG_ENGINE_LOAD_CRITIC && poateAlerta('el_critic'))
                 addAlert(`Sarcină motor critică: ${engineLoad.toFixed(1)}%`, 'danger', timeLabel);
             else if (engineLoad >= PRAG_ENGINE_LOAD_AVERTIZARE && poateAlerta('el_avertizare'))
                 addAlert(`Sarcină motor ridicată: ${engineLoad.toFixed(1)}%`, 'warning', timeLabel);
 
-            // ── Alerte RPM ───────────────────────────────────
+            //Alerte RPM
             if (rpm < PRAG_RPM_SCAZUT && poateAlerta('rpm_scazut'))
                 addAlert(`Turație scăzută la ralanti: ${Math.round(rpm)} rpm`, 'warning', timeLabel);
             else if (rpm > PRAG_RPM_SUPRATURAT && engineLoad < PRAG_ENGINE_LOAD_RALANTI && poateAlerta('rpm_supraturat'))
@@ -385,7 +385,7 @@
                 addAlert(`Turație ridicată: ${Math.round(rpm)} rpm`, 'warning', timeLabel);
         }
 
-        // ── Alerte tensiune ──────────────────────────────────
+        //Alerte tensiune
         if (tensiune < PRAG_BATERIE_DESCARCATA && poateAlerta('baterie_desc', 10))
             addAlert(`Tensiune baterie scăzută: ${tensiune.toFixed(2)}V`, 'danger', timeLabel);
         else if (tensiune > PRAG_SUPRATENSIUNE && poateAlerta('supratensiune', 10))
@@ -393,7 +393,7 @@
         else if (tensiune > PRAG_TENSIUNE_RIDICATA && poateAlerta('tensiune_ridicata', 10))
             addAlert(`Tensiune baterie ridicată: ${tensiune.toFixed(2)}V`, 'warning', timeLabel);
 
-        // ── Grafice ──────────────────────────────────────────
+        //Grafice
         // Tensiune — mereu activ
         adaugaPunct(tensiuneChart, timeLabel, tensiune.toFixed(2));
 
